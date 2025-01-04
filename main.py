@@ -2,8 +2,7 @@ import os
 import sys
 import logging
 from src import logging_config
-from src.app_manager import initialize_app
-from src.dashboard import launch_dashboard
+from src.app_manager import launch_dashboard
 
 # Default to DEV mode
 IS_PROD = False
@@ -43,12 +42,9 @@ def main():
 
     logging_config.setup_logging("PROD" if is_prod else "DEV")
 
-    # Initialize the application
-    budget = initialize_app(base_dir)
-
     # Launch the dashboard
     print(f"Running in {'PROD' if is_prod else 'DEV'} mode.")
-    launch_dashboard(budget)
+    launch_dashboard(base_dir)
 
 if __name__ == "__main__":
     main()

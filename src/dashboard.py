@@ -1,31 +1,38 @@
-import tkinter as tk
-from tkinter import ttk
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
 
-class Dashboard:
-    def __init__(self, root, budget_df):
-        self.root = root
-        self.root.title("Budget Tracker Dashboard")
-        self.budget_df = budget_df
+# Ensure the KV file is loaded
+import os
 
-        # Create the table
-        self.create_budget_table()
-
-    def create_budget_table(self):
-        # Create a Treeview widget to display the budget
-        tree = ttk.Treeview(self.root, columns=("Category", "Name", "Cost per Month"), show="headings")
-        tree.heading("Category", text="Category")
-        tree.heading("Name", text="Name")
-        tree.heading("Cost per Month", text="Cost per Month")
-
-        # Populate the Treeview with budget data
-        for _, row in self.budget_df.iterrows():
-            tree.insert("", "end", values=(row["Category"], row["Name"], f"${row['Cost per Month']:.2f}"))
-
-        # Pack the Treeview into the window
-        tree.pack(expand=True, fill="both", padx=10, pady=10)
+KV_DIR = os.path.join(os.path.dirname(__file__), "ui")
+Builder.load_file(os.path.join(KV_DIR, "dashboard.kv"))
 
 
-def launch_dashboard(budget):
-    root = tk.Tk()
-    app = Dashboard(root, budget.budget_df)
-    root.mainloop()
+class DashboardScreen(BoxLayout):
+    def __init__(self, budget, **kwargs):
+        super().__init__(**kwargs)
+        self.budget = budget
+        self.display_budget()
+
+    def display_budget(self):
+        # Access the GridLayout with the ID "budget_info"
+        budget_tab = self.ids["budget_info"]
+        for _, row in self.budget.budget_df.iterrows():
+            budget_tab.add_widget(Label(text=row["Category"]))
+            budget_tab.add_widget(Label(text=row["Name"]))
+            budget_tab.add_widget(Label(text=str(row["Cost per Month"])))
+
+
+class BudgetTrackerApp(App):
+    """
+    The Kivy App class that launches the Dashboard.
+    """
+    def __init__(self, budget, **kwargs):
+        super().__init__(**kwargs)
+        self.budget = budget
+
+    def build(self):
+        # Create a DashboardScreen instance and return it as the root widget
+        return DashboardScreen(budget=self.budget)
