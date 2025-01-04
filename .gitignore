@@ -1,0 +1,14 @@
+# Exclude Windows Distribution Directory
+Budget Tracker Dist/
+
+# Exclude Python cache files
+__pycache__/
+*.pyc
+
+# Exclude virtual environment
+venv/
+
+# Exclude PyInstaller build directories
+dist/
+build/
+*.spec
