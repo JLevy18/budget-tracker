@@ -5,15 +5,27 @@ from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from kivy.uix.layout import Layout
+from kivy.graphics import Color, Line
 from kivy.utils import platform
-from src.modules.titlebar import TitleBar
+from src.modules.appbar import AppBar
 from src.modules.hover_behavior import HoverableButton
 from ctypes import windll, Structure, c_int, byref
+from itertools import cycle
 
 # Register the class with Kivy
 import os
 import sys
 
+OUTLINE_COLORS = cycle([
+    (1, 0, 0, 1),  # Red
+    (0, 1, 0, 1),  # Green
+    (0, 0, 1, 1),  # Blue
+    (1, 1, 0, 1),  # Yellow
+    (1, 0, 1, 1),  # Magenta
+    (0, 1, 1, 1),  # Cyan
+    (0.5, 0.5, 0.5, 1),  # Gray
+])
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -47,6 +59,56 @@ def enable_shadow(hwnd):
     margins = MARGINS(-1, -1, -1, -1)  # Extend the shadow into the entire window area
     windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))
 
+def add_outlines_to_layouts(widget, enable, color_cycle=None):
+    """Recursively add outlines to all layouts."""
+    if color_cycle is None:
+        color_cycle = OUTLINE_COLORS  # Use the global color cycle
+    if not enable:  # If outlines are disabled, clear all
+        clear_outlines(widget)
+        return
+    if isinstance(widget, Layout):
+        with widget.canvas.before:
+            Color(*next(color_cycle))  # Red outline color
+            Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1)
+        widget.bind(pos=lambda instance, value: update_outline(instance, color_cycle))
+        widget.bind(size=lambda instance, value: update_outline(instance, color_cycle))
+    
+    for child in widget.children:
+        add_outlines_to_layouts(child, enable, color_cycle)
+
+def update_outline(widget, color_cycle):
+    """Update the outline to match the widget's size and position."""
+    color = next(color_cycle)  # Get the next color from the cycle
+    print(f"Updating outline: Widget={widget.__class__.__name__}, Color={color}")  # Print widget info and color
+    widget.canvas.before.clear()
+    with widget.canvas.before:
+        Color(*color)  # Red outline color
+        Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1.5)
+
+def clear_outlines(widget):
+    """Clear outlines from all layouts."""
+    if isinstance(widget, Layout):
+        widget.canvas.before.clear()
+    for child in widget.children:
+        clear_outlines(child)
+
+def toggle_outlines(widget, enable, color_cycle=None):
+    """Enable or disable outlines for all layouts."""
+    if color_cycle is None:
+        color_cycle = OUTLINE_COLORS  # Use the global color cycle
+
+    if isinstance(widget, Layout):
+        if enable:
+            widget.bind(pos=lambda instance, value: update_outline(instance, color_cycle))
+            widget.bind(size=lambda instance, value: update_outline(instance, color_cycle))
+            update_outline(widget, color_cycle)  # Initial outline update
+        else:
+            widget.unbind(pos=None, size=None)  # Unbind updates
+            widget.canvas.before.clear()
+
+    for child in widget.children:
+        toggle_outlines(child, enable, color_cycle)
+
 class DashboardScreen(BoxLayout):
     def __init__(self, budget, **kwargs):
         super().__init__(**kwargs)
@@ -66,9 +128,11 @@ class BudgetTrackerApp(App):
     """
     The Kivy App class that launches the Dashboard.
     """
-    def __init__(self, budget, **kwargs):
+    def __init__(self, budget, is_prod=False, **kwargs):
         super().__init__(**kwargs)
         self.budget = budget
+        self.is_prod = is_prod
+        self.outlines_enabled = False
         self.window_state = {
             "size": Window.size,
             "pos": (Window.left, Window.top),
@@ -82,13 +146,23 @@ class BudgetTrackerApp(App):
         Window.clearcolor = self.hex_to_rgba("#14202E")
         Window.borderless = True
         Window.custom_titlebar = True
-        Window.set_custom_titlebar(TitleBar())
+        Window.set_custom_titlebar(AppBar())
         Window.set_icon(os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.ico"))
 
         hwnd = windll.user32.GetForegroundWindow()
         enable_shadow(hwnd)
 
-        return DashboardScreen(self.budget)
+        if not self.is_prod:
+            Window.bind(on_key_down=self.on_key_down)
+
+        root = DashboardScreen(self.budget)
+        return root
+
+    def on_key_down(self, window, key, scancode, codepoint, modifier):
+        """Handle key presses."""
+        if key == 284:
+            self.outlines_enabled = not self.outlines_enabled
+            toggle_outlines(self.root, self.outlines_enabled)
 
     def minimize_window(self):
         Window.minimize()

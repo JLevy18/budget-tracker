@@ -19,9 +19,9 @@ def initialize_app(base_dir):
     return budget
 
 
-def launch_dashboard(base_dir):
+def launch_dashboard(base_dir, is_prod=False):
     """
     Launch the Kivy-based dashboard.
     """
     budget = initialize_app(base_dir)
-    BudgetTrackerApp(budget).run()
+    BudgetTrackerApp(budget, is_prod).run()

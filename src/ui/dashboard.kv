@@ -1,6 +1,10 @@
 <DashboardScreen>:
     orientation: 'vertical'
-    TitleBar:
+    AnchorLayout:
+        anchor_y: "top"
+        size_hint: 1, None
+        height: self.children[0].height - 25  # Dynamically adjust to AppBar's height
+        AppBar:
     ScrollView:
         size_hint: 1, 1
         do_scroll_x: False

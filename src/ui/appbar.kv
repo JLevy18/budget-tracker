@@ -6,39 +6,50 @@
             pos: self.pos
             size: self.size
 
-<TitleBar>:
+<AppBar>:
     orientation: "horizontal"
     size_hint: 1, None
-    height: 50
-
      # Left AnchorLayout (Empty for now)
     AnchorLayout:
         anchor_x: "left"
-        anchor_y: "center"
-        size_hint_x: 1  # Allow dynamic resizing
-        padding: [3, 50, 0, 0]
-        BoxLayout:  # Placeholder for future content
+        anchor_y: "top"
+        padding: [5,5,5,5]
+        size_hint_x: 0.25
+        BoxLayout:
+            orientation: "horizontal"
+            width: 64
+            height: 64
+            size_hint: None, None
+            Button:
+                background_normal: app.logo
+                background_down: app.logo
+                background_color: 1, 1, 1, 1
+                border: [0, 0, 0, 0]
+
+    AnchorLayout:
+        anchor_x: "center"
+        anchor_y: "top"
+        size_hint_x: 1
+        height: 50
+        BoxLayout:
+            padding: [0,5,5,0]
             orientation: "horizontal"
             size_hint: None, None
-            height: 30  # Match the title bar height
-            width: 40  # Match button dimensions
-            Button:
-                size_hint: None, None
-                size: 64, 64  # Match title bar height
-                background_normal: app.logo  # Image for the button
-                background_down: app.logo  # Optional pressed state
-                background_color: 1, 1, 1, 1  # Keep the button fully opaque
-                border: [0, 0, 0, 0]  # Remove border
-
+            width: 200
+            height: 30
+            Label:
+                text: "Budget Tracker"
+                font_size: "18sp"
      # Right AnchorLayout
     AnchorLayout:
         anchor_x: "right"
         anchor_y: "top"
         width: self.children[0].minimum_width
+        size_hint_x: 0.25
         BoxLayout:  # Horizontal layout for the buttons
             orientation: "horizontal"
             size_hint: None, None
-            height: 30  # Match the title bar height
+            height: self.minimum_height  # Match the title bar height
             width: self.minimum_width
             HoverableButton:
                 text: "\uE15B"  # Minimize icon

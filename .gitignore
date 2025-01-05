@@ -1,5 +1,6 @@
 # Exclude Windows Distribution Directory
 Budget Tracker Dist/
+src/budgets/
 
 # Exclude Python cache files
 __pycache__/

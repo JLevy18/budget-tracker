@@ -43,7 +43,7 @@ def main():
     logging_config.setup_logging("PROD" if is_prod else "DEV")
 
     # Launch the dashboard
-    launch_dashboard(base_dir)
+    launch_dashboard(base_dir, is_prod)
 
 if __name__ == "__main__":
     main()
