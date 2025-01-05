@@ -1,19 +1,13 @@
 <DashboardScreen>:
     orientation: 'vertical'
-
-    Label:
-        text: 'Budget Tracker Dashboard'
-        font_size: 24
-        size_hint_y: None
-        height: 50
-
+    TitleBar:
     ScrollView:
+        size_hint: 1, 1
+        do_scroll_x: False
         GridLayout:
             id: budget_info
             cols: 3
             size_hint_y: None
-            row_default_height: 40  # Adjust row height
+            row_default_height: 40
             row_force_default: True
-            spacing: 10  # Add spacing between cells
-            padding: [10, 10, 10, 10]  # Add padding
             height: self.minimum_height

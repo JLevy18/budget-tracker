@@ -1,5 +1,5 @@
 from src.budget import Budget
-from src.dashboard import BudgetTrackerApp
+from src.modules.dashboard import BudgetTrackerApp
 import os
 
 def initialize_app(base_dir):

@@ -32,9 +32,9 @@ git clone https://github.com/username/budget-tracker.git
 cd buget-tracker
 ```
 ##### 2. Build the application
-- Run the packaging script:
+- Run the build script (This may takea few minutes):
 ```
-python package.py
+python build.py
 ```
 - The executable will be generated in the `dist` directory.
 ##### 3. Launch the application

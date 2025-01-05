@@ -1,0 +1,50 @@
+<HoverableButton>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<TitleBar>:
+    orientation: "horizontal"
+    size_hint: 1, None
+    height: 40
+
+     # Left AnchorLayout (Empty for now)
+    AnchorLayout:
+        anchor_x: "left"
+        anchor_y: "center"
+        size_hint_x: 1  # Allow dynamic resizing
+        BoxLayout:  # Placeholder for future content
+            size_hint: None, None
+            size: 0, 0
+
+     # Right AnchorLayout
+    AnchorLayout:
+        anchor_x: "right"
+        anchor_y: "center"
+        size_hint_x: None
+        BoxLayout:  # Horizontal layout for the buttons
+            orientation: "horizontal"
+            size_hint: None, None
+            width: self.minimum_width  # Dynamically adjust to fit buttons
+            height: 40  # Match the title bar height
+            HoverableButton:
+                text: "\uE15B"  # Minimize icon
+                size_hint: None, None
+                size: 40, 40
+                font_name: "resources/MaterialRounded.ttf"
+                on_release: app.minimize_window()
+            HoverableButton:
+                text: "\uE835"  # Maximize icon
+                size_hint: None, None
+                size: 40, 40
+                font_name: "resources/MaterialRounded.ttf"
+                on_release: app.maximize_window()
+            HoverableButton:
+                text: "\uE5CD"  # Close icon
+                size_hint: None, None
+                size: 40, 40
+                font_name: "resources/MaterialRounded.ttf"
+                on_release: app.close_window()

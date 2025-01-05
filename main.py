@@ -30,7 +30,7 @@ def main():
     is_prod = IS_PROD
 
     # Set base directory
-    base_dir = os.path.expandvars(r"%userappdata%\BudgetTracker") if is_prod else os.path.join("src")
+    base_dir = os.path.expandvars(r"%appdata%\BudgetTracker") if is_prod else os.path.join("src")
 
     # Create necessary directories
     create_directories(base_dir, is_prod)
@@ -43,7 +43,6 @@ def main():
     logging_config.setup_logging("PROD" if is_prod else "DEV")
 
     # Launch the dashboard
-    print(f"Running in {'PROD' if is_prod else 'DEV'} mode.")
     launch_dashboard(base_dir)
 
 if __name__ == "__main__":
