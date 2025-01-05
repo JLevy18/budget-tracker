@@ -14,17 +14,24 @@ from ctypes import windll, Structure, c_int, byref
 import os
 import sys
 
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
-Config.set('graphics', 'resizable', True)
-Config.set('kivy', 'window', 'sdl2')
-Config.set('graphics', 'dpi', 'auto')
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # Move up one level to 'src'
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
-    KV_DIR = os.path.join(sys._MEIPASS, "src", "ui")
+    base_path = sys._MEIPASS
+    KV_DIR = os.path.join(sys._MEIPASS, "ui")
 else:
-    KV_DIR = os.path.join(BASE_DIR, "ui")  # Resolve to 'src/ui'
+    base_path = os.path.abspath(".")  # Current working directory in dev mode
+    KV_DIR = os.path.join(BASE_DIR, "ui")
+
+font_path = os.path.join(base_path, "resources", "MaterialRounded.ttf")
+logo = os.path.join(base_path, "resources", "BudgetTracker.png")
+
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+Config.set('graphics', 'resizable', True)
+Config.set('graphics', 'dpi', 'auto')
+Config.set('kivy', 'window', 'sdl2')
+Config.set("kivy", "default_font", font_path)
 
 Builder.load_file(os.path.join(KV_DIR, "dashboard.kv"))
 
@@ -67,6 +74,8 @@ class BudgetTrackerApp(App):
             "pos": (Window.left, Window.top),
             "is_maximized": False
         }
+        self.font_path = font_path
+        self.logo = logo
 
     def build(self):
 

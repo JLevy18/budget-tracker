@@ -6,6 +6,7 @@ from colorama import init, Fore, Style
 import sys
 import ctypes
 import argparse
+import glob
 
 # Initialize colorama for colored output
 init(autoreset=True)
@@ -58,6 +59,27 @@ def package_application(verbose=False):
         file.write(main_code)
 
     try:
+
+        # Path to the src/ui directory relative to build.py
+        kv_dir = os.path.join("src", "ui")
+        kv_files = glob.glob(os.path.join(kv_dir, "*.kv"))
+        resources_dir = "resources"
+        icons_file = os.path.join(resources_dir, "MaterialRounded.ttf")
+        logo_file = os.path.join(resources_dir, "BudgetTracker.png")
+
+        # Generate `--add-data` arguments for all `.kv` files
+        add_data_args = []
+        for kv_file in kv_files:
+            # Relative path to the build.py directory
+            relative_path = os.path.relpath(kv_file, os.path.dirname(__file__)).replace("\\", "/")
+            # Target directory inside the PyInstaller bundle
+            add_data_args.append(f"{relative_path};/ui")
+
+        relative_font_path = os.path.relpath(icons_file, os.path.dirname(__file__)).replace("\\", "/")
+        add_data_args.append(f"{relative_font_path};/resources")
+
+        relative_font_path = os.path.relpath(logo_file, os.path.dirname(__file__)).replace("\\", "/")
+        add_data_args.append(f"{relative_font_path};/resources")
         # Build the application using PyInstaller
         command = [
             "pyinstaller",
@@ -65,11 +87,13 @@ def package_application(verbose=False):
             "--noconsole",
             "--name=BudgetTracker",
             "--icon=resources/BudgetTracker.ico",
-            "--add-data=src/ui/dashboard.kv;src/ui",
             "main.py",
-        ]
+        ] + [f"--add-data={arg}" for arg in add_data_args]
 
         print(f"{Style.BRIGHT}{Fore.BLUE}Starting build...")
+        print(f"{Fore.BLUE}UI Components:{Style.RESET_ALL}")
+        for arg in add_data_args:
+            print(f"  - {arg}")
 
         if verbose:
             # Run with real-time output display

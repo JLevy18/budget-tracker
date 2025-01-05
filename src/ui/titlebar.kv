@@ -25,8 +25,8 @@
             Button:
                 size_hint: None, None
                 size: 64, 64  # Match title bar height
-                background_normal: "resources/BudgetTracker.png"  # Image for the button
-                background_down: "resources/BudgetTracker.png"  # Optional pressed state
+                background_normal: app.logo  # Image for the button
+                background_down: app.logo  # Optional pressed state
                 background_color: 1, 1, 1, 1  # Keep the button fully opaque
                 border: [0, 0, 0, 0]  # Remove border
 
@@ -44,17 +44,17 @@
                 text: "\uE15B"  # Minimize icon
                 size_hint: None, None
                 size: 40, 30
-                font_name: "resources/MaterialRounded.ttf"
+                font_name: app.font_path
                 on_release: app.minimize_window()
             HoverableButton:
                 text: "\uE835"  # Maximize icon
                 size_hint: None, None
                 size: 40, 30
-                font_name: "resources/MaterialRounded.ttf"
+                font_name: app.font_path
                 on_release: app.maximize_window()
             HoverableButton:
                 text: "\uE5CD"  # Close icon
                 size_hint: None, None
                 size: 40, 30
-                font_name: "resources/MaterialRounded.ttf"
+                font_name: app.font_path
                 on_release: app.close_window()

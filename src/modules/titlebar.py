@@ -9,13 +9,15 @@ from ctypes import windll, Structure, c_long, byref
 import os
 import sys
 
-# Ensure the KV file is loaded
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # Move up one level to 'src'
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
-    KV_DIR = os.path.join(sys._MEIPASS, "src", "ui")
+    # Resolve `src/ui` relative to the PyInstaller bundle
+    KV_DIR = os.path.join(sys._MEIPASS, "ui")
 else:
-    KV_DIR = os.path.join(BASE_DIR, "ui")  # Resolve to 'src/ui'
+    # Resolve `src/ui` relative to the current script's directory
+    KV_DIR = os.path.join(BASE_DIR, "ui")
+print(f"KV_DIR resolved to: {KV_DIR}")
 
 Builder.load_file(os.path.join(KV_DIR, "titlebar.kv"))
 
