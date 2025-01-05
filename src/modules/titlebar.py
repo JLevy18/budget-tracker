@@ -39,10 +39,9 @@ class TitleBar(BoxLayout):
         if self.collide_point(*local_pos):
             for child in self.children:
                 # Skip AnchorLayouts
-                if isinstance(child, AnchorLayout) and child.collide_point(*touch.pos):
+                if isinstance(child, (AnchorLayout)) and child.collide_point(*touch.pos):
                     for sub_child in child.children:
                         if sub_child.collide_point(*touch.pos):
-                            print(f"Touch is on interactive widget: {sub_child}")
                             return super().on_touch_down(touch)
 
             self.is_dragging = True

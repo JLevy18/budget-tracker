@@ -9,42 +9,52 @@
 <TitleBar>:
     orientation: "horizontal"
     size_hint: 1, None
-    height: 40
+    height: 50
 
      # Left AnchorLayout (Empty for now)
     AnchorLayout:
         anchor_x: "left"
         anchor_y: "center"
         size_hint_x: 1  # Allow dynamic resizing
+        padding: [3, 50, 0, 0]
         BoxLayout:  # Placeholder for future content
+            orientation: "horizontal"
             size_hint: None, None
-            size: 0, 0
+            height: 30  # Match the title bar height
+            width: 40  # Match button dimensions
+            Button:
+                size_hint: None, None
+                size: 64, 64  # Match title bar height
+                background_normal: "resources/BudgetTracker.png"  # Image for the button
+                background_down: "resources/BudgetTracker.png"  # Optional pressed state
+                background_color: 1, 1, 1, 1  # Keep the button fully opaque
+                border: [0, 0, 0, 0]  # Remove border
 
      # Right AnchorLayout
     AnchorLayout:
         anchor_x: "right"
-        anchor_y: "center"
-        size_hint_x: None
+        anchor_y: "top"
+        width: self.children[0].minimum_width
         BoxLayout:  # Horizontal layout for the buttons
             orientation: "horizontal"
             size_hint: None, None
-            width: self.minimum_width  # Dynamically adjust to fit buttons
-            height: 40  # Match the title bar height
+            height: 30  # Match the title bar height
+            width: self.minimum_width
             HoverableButton:
                 text: "\uE15B"  # Minimize icon
                 size_hint: None, None
-                size: 40, 40
+                size: 40, 30
                 font_name: "resources/MaterialRounded.ttf"
                 on_release: app.minimize_window()
             HoverableButton:
                 text: "\uE835"  # Maximize icon
                 size_hint: None, None
-                size: 40, 40
+                size: 40, 30
                 font_name: "resources/MaterialRounded.ttf"
                 on_release: app.maximize_window()
             HoverableButton:
                 text: "\uE5CD"  # Close icon
                 size_hint: None, None
-                size: 40, 40
+                size: 40, 30
                 font_name: "resources/MaterialRounded.ttf"
                 on_release: app.close_window()

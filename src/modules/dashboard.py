@@ -8,6 +8,7 @@ from kivy.uix.label import Label
 from kivy.utils import platform
 from src.modules.titlebar import TitleBar
 from src.modules.hover_behavior import HoverableButton
+from ctypes import windll, Structure, c_int, byref
 
 # Register the class with Kivy
 import os
@@ -28,6 +29,16 @@ else:
 Builder.load_file(os.path.join(KV_DIR, "dashboard.kv"))
 
 Factory.register("HoverableButton", cls=HoverableButton)
+
+class MARGINS(Structure):
+    _fields_ = [("cxLeftWidth", c_int),
+                ("cxRightWidth", c_int),
+                ("cyTopHeight", c_int),
+                ("cyBottomHeight", c_int)]
+
+def enable_shadow(hwnd):
+    margins = MARGINS(-1, -1, -1, -1)  # Extend the shadow into the entire window area
+    windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))
 
 class DashboardScreen(BoxLayout):
     def __init__(self, budget, **kwargs):
@@ -65,6 +76,9 @@ class BudgetTrackerApp(App):
         Window.set_custom_titlebar(TitleBar())
         Window.set_icon(os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.ico"))
 
+        hwnd = windll.user32.GetForegroundWindow()
+        enable_shadow(hwnd)
+
         return DashboardScreen(self.budget)
 
     def minimize_window(self):
@@ -73,46 +87,33 @@ class BudgetTrackerApp(App):
     def maximize_window(self):
         if self.window_state["is_maximized"]:
             # Restore the original size and position
-            if platform == "win":
-                from ctypes import windll
-                hwnd = windll.user32.GetForegroundWindow()  # Get current window handle
-                user32 = windll.user32
-                # Restore size and position using MoveWindow
-                user32.MoveWindow(
-                    hwnd,
-                    int(self.window_state["pos"][0]),  # Restore X position
-                    int(self.window_state["pos"][1]),  # Restore Y position
-                    int(self.window_state["size"][0]),  # Restore width
-                    int(self.window_state["size"][1]),  # Restore height
-                    True,
-                )
-            else:
-                Window.borderless = True
-                Window.size = self.window_state["size"]
-                Window.left, Window.top = self.window_state["pos"]
-
+            from ctypes import windll
+            hwnd = windll.user32.GetForegroundWindow()  # Get current window handle
+            user32 = windll.user32
+            # Restore size and position using MoveWindow
+            user32.MoveWindow(
+                hwnd,
+                int(self.window_state["pos"][0]),  # Restore X position
+                int(self.window_state["pos"][1]),  # Restore Y position
+                int(self.window_state["size"][0]),  # Restore width
+                int(self.window_state["size"][1]),  # Restore height
+                True,
+            )
             self.window_state["is_maximized"] = False
         else:
             # Save the current size and position
             self.window_state["size"] = Window.size[:]
             self.window_state["pos"] = (Window.left, Window.top)
 
-            # Platform-specific logic for screen size
-            if platform == "win":
-                from ctypes import windll
-                hwnd = windll.user32.GetForegroundWindow()
-                user32 = windll.user32
-                user32.SetProcessDPIAware()  # Enable DPI awareness
-                screen_width = user32.GetSystemMetrics(0)  # Full screen width
-                screen_height = user32.GetSystemMetrics(1)  # Full screen height
-                # Explicitly resize and position the window
-                windll.user32.MoveWindow(hwnd, 0, 0, screen_width, screen_height, True)
-            else:
-                # Maximize on Linux/MacOS
-                screen_width, screen_height = Window.system_size
-                Window.size = (screen_width, screen_height)
-                Window.left, Window.top = 0, 0
-
+            # Maximize the window
+            from ctypes import windll
+            hwnd = windll.user32.GetForegroundWindow()
+            user32 = windll.user32
+            user32.SetProcessDPIAware()  # Enable DPI awareness
+            screen_width = user32.GetSystemMetrics(0)  # Full screen width
+            screen_height = user32.GetSystemMetrics(1)  # Full screen height
+            # Explicitly resize and position the window
+            windll.user32.MoveWindow(hwnd, 0, 0, screen_width, screen_height, True)
             self.window_state["is_maximized"] = True
 
 
