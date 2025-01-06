@@ -17,20 +17,27 @@ from src.modules.hover_behavior import HoverableButton
 from src.budget import Budget
 from src.content_factory import ContentFactory
 
-from itertools import cycle
 from ctypes import windll, Structure, c_int, byref
 
 
 
-OUTLINE_COLORS = cycle([
-    (1, 0, 0, 1),  # Red
-    (0, 1, 0, 1),  # Green
-    (0, 0, 1, 1),  # Blue
-    (1, 1, 0, 1),  # Yellow
-    (1, 0, 1, 1),  # Magenta
-    (0, 1, 1, 1),  # Cyan
-    (0.5, 0.5, 0.5, 1),  # Gray
-])
+OUTLINE_COLORS = [
+    ((1, 0, 0, 1), "Red"),        # Red
+    ((1, 0.5, 0, 1), "Orange"),    # Orange
+    ((1, 1, 0, 1), "Yellow"),     # Yellow
+    ((0, 1, 0, 1), "Green"),      # Green
+    ((0, 0, 1, 1), "Blue"),       # Blue
+    ((0, 1, 1, 1), "Cyan"),       # Cyan
+    ((0.5, 0, 0.5, 1), "Purple"),  # Purple
+    ((1, 0, 1, 1), "Magenta"),    # Magenta
+    ((0.5, 0.5, 0.5, 1), "Gray"), # Gray
+    
+    ((0.5, 0, 0, 1), "Dark Red"), # Dark Red
+    ((0, 0.5, 0, 1), "Dark Green"), # Dark Green
+    ((0, 0, 0.5, 1), "Dark Blue"), # Dark Blue
+]
+
+displayed_levels = set()
 
 # Determine base paths
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
@@ -199,30 +206,33 @@ def enable_shadow(hwnd):
     margins = MARGINS(-1, -1, -1, -1)  # Extend the shadow into the entire window area
     windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))
 
-def add_outlines_to_layouts(widget, enable, color_cycle=None):
+def add_outlines_to_layouts(widget, enable, level=0):
     """Recursively add outlines to all layouts."""
-    if color_cycle is None:
-        color_cycle = OUTLINE_COLORS  # Use the global color cycle
     if not enable:  # If outlines are disabled, clear all
         clear_outlines(widget)
         return
+
+    color, color_name = OUTLINE_COLORS[level % len(OUTLINE_COLORS)]
+    if level not in displayed_levels:  # Display level color only once
+        print(f"Level {level}: Color is {color_name}")
+        displayed_levels.add(level)
+
     if isinstance(widget, Layout):
         with widget.canvas.before:
-            Color(*next(color_cycle))  # Red outline color
+            Color(*color)  # Red outline color
             Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1)
-        widget.bind(pos=lambda instance, value: update_outline(instance, color_cycle))
-        widget.bind(size=lambda instance, value: update_outline(instance, color_cycle))
+        widget.bind(pos=lambda instance, value: update_outline(instance, color))
+        widget.bind(size=lambda instance, value: update_outline(instance, color))
     
     for child in widget.children:
-        add_outlines_to_layouts(child, enable, color_cycle)
+        add_outlines_to_layouts(child, enable, level + 1)
 
-def update_outline(widget, color_cycle):
+def update_outline(widget, color):
     """Update the outline to match the widget's size and position."""
-    color = next(color_cycle)  # Get the next color from the cycle
     widget.canvas.before.clear()
     with widget.canvas.before:
         Color(*color)  # Red outline color
-        Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1.5)
+        Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1)
 
 def clear_outlines(widget):
     """Clear outlines from all layouts."""
@@ -231,19 +241,10 @@ def clear_outlines(widget):
     for child in widget.children:
         clear_outlines(child)
 
-def toggle_outlines(widget, enable, color_cycle=None):
+def toggle_outlines(widget, enable):
     """Enable or disable outlines for all layouts."""
-    if color_cycle is None:
-        color_cycle = OUTLINE_COLORS  # Use the global color cycle
-
-    if isinstance(widget, Layout):
-        if enable:
-            widget.bind(pos=lambda instance, value: update_outline(instance, color_cycle))
-            widget.bind(size=lambda instance, value: update_outline(instance, color_cycle))
-            update_outline(widget, color_cycle)  # Initial outline update
-        else:
-            widget.unbind(pos=None, size=None)  # Unbind updates
-            widget.canvas.before.clear()
-
-    for child in widget.children:
-        toggle_outlines(child, enable, color_cycle)
+    if enable:
+        add_outlines_to_layouts(widget, enable=True)  # Reuse the modified add_outlines_to_layouts function
+    else:
+        clear_outlines(widget)
+        displayed_levels.clear()
