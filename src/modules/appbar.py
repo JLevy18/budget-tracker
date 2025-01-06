@@ -20,7 +20,7 @@ else:
     KV_DIR = os.path.join(BASE_DIR, "ui")
 print(f"KV_DIR resolved to: {KV_DIR}")
 
-Builder.load_file(os.path.join(KV_DIR, "appbar.kv"))
+Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
 
 class POINT(Structure):
     _fields_ = [("x", c_long), ("y", c_long)]

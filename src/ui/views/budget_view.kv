@@ -1,16 +1,13 @@
-<DashboardScreen>:
-    orientation: 'vertical'
-    AnchorLayout:
-        anchor_y: "top"
-        size_hint: 1, None
-        height: self.children[0].height - 25  # Dynamically adjust to AppBar's height
-        AppBar:
+<BudgetView>:
+    orientation: 'horizontal'
+    size_hint: 1,1
     ScrollView:
-        size_hint: 1, 1
         do_scroll_x: False
+        size_hint: 1,1
         GridLayout:
             id: budget_info
             cols: 3
+            size_hint_x: 1
             size_hint_y: None
             row_default_height: 40
             row_force_default: True
