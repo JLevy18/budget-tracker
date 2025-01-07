@@ -11,10 +11,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.layout import Layout
 from kivy.graphics import Color, Line
 
-from src.modules.appbar import AppBar
+from src.modules.app_bar import AppBar
 from src.modules.content_area import ContentArea
 from src.modules.hover_behavior import HoverableButton
-from src.budget import Budget
+from src.modules.classes.budget import Budget
 from src.content_factory import ContentFactory
 
 from ctypes import windll, Structure, c_int, byref
@@ -37,7 +37,7 @@ OUTLINE_COLORS = [
     ((0, 0, 0.5, 1), "Dark Blue"), # Dark Blue
 ]
 
-displayed_levels = set()
+displayed_levels = set({0,1,2,3,4,5,6,7,8})
 
 # Determine base paths
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
@@ -62,12 +62,7 @@ def initialize_app(base_dir, is_prod):
     """
     Initialize the application by ensuring directories exist and loading the budget.
     """
-    budgets_dir = os.path.join(base_dir, "budgets")
-    budget_path = os.path.join(budgets_dir, "budget.csv")
-
-    os.makedirs(budgets_dir, exist_ok=True)  # Ensure directories exist
-    budget = Budget(budget_path)  # Create the budget instance
-    content_factory = ContentFactory(budget)  # Initialize content factory
+    content_factory = ContentFactory()  # Initialize content factory
 
     return BudgetTrackerApp(content_factory, is_prod=is_prod)
 

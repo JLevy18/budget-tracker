@@ -1,36 +1,39 @@
 <DashboardView>:
     orientation: 'horizontal'
+    padding: [20,20,20,20]
     BoxLayout:
         orientation: 'vertical'
-        size_hint: 0.33, 1
+        size_hint: 0.4, 1
         BoxLayout:
             orientation: 'horizontal'
-            size_hint_y: 0.05
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: 0.65
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: 0.4
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint: 0.66, 1
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: 0.05
+            size_hint_y: 0.55
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "top"
+                id: radial_budget_progress
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: 0.45
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
-                id: budget_pie_chart
+                id: monthly_spending_summary
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 0.6, 1
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.45
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
-                id: actual_pie_chart
+                id: budget_category_pie_chart
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                id: actual_category_pie_chart
         BoxLayout:
-            padding: [0,20,0,10]
+            padding: [20,20,0,0]
             size_hint_y: 0.5
             id: budget_view
             

@@ -2,6 +2,9 @@ import os
 import logging
 from datetime import datetime
 
+logging.getLogger('PIL').setLevel(logging.WARNING)
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
+
 # Lazy initialization for the log file
 log_file = None
 file_handler = None

@@ -12,7 +12,7 @@ def create_directories(base_dir, is_prod):
     directories = ["budgets", "statements", "transactions"]
 
     for dir_name in directories:
-        path = os.path.join(base_dir, dir_name)
+        path = os.path.join(base_dir, "data", dir_name)
         os.makedirs(path, exist_ok=True)
 
 def check_logs_directory(logs_dir):
