@@ -28,7 +28,7 @@ class RadialPercentageTracker(FigureCanvasKivyAgg):
 
 
         now = datetime.now()
-        current_day = now.day
+        current_day = 27
         current_month = now.month
         current_year = now.year
         total_days = calendar.monthrange(current_year, current_month)[1]
@@ -44,7 +44,7 @@ class RadialPercentageTracker(FigureCanvasKivyAgg):
             theta1=end_angle, 
             theta2=start_angle,  # Clockwise fill
             width=0.25, 
-            facecolor="#116530",  # Green progress
+            facecolor="#21B6A8",  # Green progress
             edgecolor="none", 
             antialiased=True
         )
@@ -118,10 +118,24 @@ class RadialPercentageTracker(FigureCanvasKivyAgg):
             color="#FFFFFF", 
             fontweight='normal'  # Lighter weight for the text
         )
+        
+        # Add top-left label
+        self.ax.text(
+            -2.3, 1.6, f"{now.strftime("%B")} spending",  # Month label
+            ha='left', va='top', fontsize=11, color="#FFFFFF", fontweight="bold"
+        )
+        self.ax.text(
+            -2.3, 1.3, f"$1,459.32",  # Amount spent label
+            ha='left', va='top', fontsize=16, color="#FFFFFF", fontweight="light"
+        )
+        self.ax.text(
+            -2.3, 1, "Spent so far",  # Supporting text
+            ha='left', va='top', fontsize=9, color="#FFFFFF"
+        )
 
         # Hide axes
         self.ax.axis('off')
-        self.fig.subplots_adjust(left=0, right=1, top=1, bottom=0.05)
+        self.fig.subplots_adjust(left=0, right=1, top=0.95, bottom=0)
         # Redraw the figure
         self.draw_idle()
 

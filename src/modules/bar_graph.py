@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 from datetime import datetime
+from matplotlib.patches import Rectangle
 
 class BarGraph(FigureCanvasKivyAgg):
 
@@ -13,7 +14,9 @@ class BarGraph(FigureCanvasKivyAgg):
         self.spending_data = spending_data
         self.current_year = datetime.now().year
         self.fig = fig
+        self.fig.canvas.mpl_connect("motion_notify_event", self.motion_notify_event)
         self.ax = ax
+        self.hover_text = None
         super().__init__(self.fig, **kwargs)
 
         self.create_bar_graph()
@@ -49,7 +52,7 @@ class BarGraph(FigureCanvasKivyAgg):
 
         # Create bars
         self.ax.bar(
-            x_positions, display_spending, color="#116530", edgecolor="none"
+            x_positions, display_spending, color="#21B6A8", edgecolor="none"
         )
 
         # Set X-axis labels
@@ -67,7 +70,7 @@ class BarGraph(FigureCanvasKivyAgg):
         y_labels[0] = ""  # Make the first label invisible
         y_labels[-1] = ""  # Make the last label invisible
         self.ax.set_yticks(y_ticks)  # Set only the ticks from the second value onward
-        self.ax.set_yticklabels(y_labels, fontsize=8, color="#FFFFFF", va="center", x=0.03)
+        self.ax.set_yticklabels(y_labels, fontsize=8, color="#FFFFFF", va="center")
         
 
         # Customize the axes
@@ -99,7 +102,43 @@ class BarGraph(FigureCanvasKivyAgg):
         self.draw_idle()
 
     def motion_notify_event(self, x, y, *args, **kwargs):
-        pass
+        # Convert Kivy's (x, y) into Matplotlib's axes coordinates
+        x_data, y_data = self.ax.transData.inverted().transform((x, y))
+
+        # Check if the cursor is over a bar
+        for bar in self.ax.patches:  # Each bar is a Rectangle patch
+            if isinstance(bar, Rectangle):
+                bar_bbox = bar.get_bbox()
+                bar_display_bbox = self.ax.transData.transform_bbox(bar_bbox)
+                if bar_display_bbox.contains(x,y):
+                    # Get the bar's value
+                    value = bar.get_height()
+                    # Get the bar's center for positioning the text
+                    bar_center = bar.get_x() + bar.get_width() / 2
+
+                    # Clear previous hover text
+                    if self.hover_text:
+                        self.hover_text.remove()
+
+                    # Add hover text
+                    self.hover_text = self.ax.text(
+                        bar_center, value + 15,  # Slightly above the bar
+                        f"${value:.2f}",
+                        ha="center",
+                        va="bottom",
+                        fontsize=10,
+                        color="#FFFFFF",
+                        fontweight="bold"
+                    )
+                    self.draw_idle()
+                    return
+
+        # If not hovering over any bar, clear the hover text
+        if self.hover_text:
+            self.hover_text.remove()
+            self.hover_text = None
+            self.draw_idle()
+
     def resize_event(self, *args, **kwargs):
         pass  
     def button_press_event(self, *args, **kwargs):

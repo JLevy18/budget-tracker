@@ -31,7 +31,13 @@ class DashboardView(BoxLayout):
 
         fig, ax = plt.subplots(figsize=(5, 5))
         fig.patch.set_facecolor("none")
-        fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        fig.subplots_adjust(left=0, right=1, top=0.8, bottom=0)
+        
+        if widget_id == "budget_category_pie_chart":
+            ax.set_title("Budgeted", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
+        elif widget_id == "actual_category_pie_chart":
+            ax.set_title("Actual", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
+        
         ax.set_facecolor("none")
 
         wedges, _ = ax.pie(data, labels=None, startangle=90, colors=colors)

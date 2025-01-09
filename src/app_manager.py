@@ -12,6 +12,7 @@ from kivy.uix.layout import Layout
 from kivy.graphics import Color, Line
 
 from src.modules.app_bar import AppBar
+from src.modules.nav_bar import NavBar
 from src.modules.content_area import ContentArea
 from src.modules.hover_behavior import HoverableButton
 from src.modules.classes.budget import Budget
@@ -55,9 +56,6 @@ Config.set('kivy', 'window', 'sdl2')
 Config.set('graphics', 'show_fps', '1')
 Config.set('modules', 'monitor', '1')
 
-Factory.register("HoverableButton", cls=HoverableButton)
-Factory.register("ContentArea", cls=ContentArea)
-
 def initialize_app(base_dir, is_prod):
     """
     Initialize the application by ensuring directories exist and loading the budget.
@@ -95,8 +93,15 @@ class BudgetTrackerApp(App):
             "pos": (Window.left, Window.top),
             "is_maximized": False
         }
-        self.font_path = os.path.join(os.path.dirname(__file__), "../resources/MaterialRounded.ttf")
+        self.font_path = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded.ttf")
+        self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
+        
+    def change_font_path_callback(self, widget, state):
+        if state == "enter":
+            widget.font_name = self.font_path
+        elif state == "leave":
+            widget.font_name = self.font_path_extralight
 
     def build(self):
 
@@ -189,7 +194,12 @@ class BudgetTrackerApp(App):
     def hex_to_rgba(hex_color):
         """Convert a hex color string to an RGBA tuple."""
         hex_color = hex_color.lstrip("#")
-        return [int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4)] + [1]
+        if len(hex_color) == 8:  # Includes alpha channel
+            return [int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4, 6)]
+        elif len(hex_color) == 6:  # No alpha channel
+            return [int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4)] + [1.0]
+        else:
+            raise ValueError("Invalid hex color format. Use #RRGGBB or #RRGGBBAA.")
 
 class MARGINS(Structure):
     _fields_ = [("cxLeftWidth", c_int),

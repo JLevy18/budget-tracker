@@ -9,7 +9,7 @@
 <AppBar>:
     orientation: "horizontal"
     size_hint: 1, None
-     # Left AnchorLayout (Empty for now)
+    # Left AnchorLayout (Empty for now)
     AnchorLayout:
         anchor_x: "left"
         anchor_y: "top"
@@ -17,14 +17,11 @@
         size_hint_x: 0.25
         BoxLayout:
             orientation: "horizontal"
-            width: 64
-            height: 64
+            size: 64, 64
             size_hint: None, None
-            Button:
-                background_normal: app.logo
-                background_down: app.logo
-                background_color: 1, 1, 1, 1
-                border: [0, 0, 0, 0]
+            HoverableButton:
+                size: 64, 64
+                icon: app.logo
 
     AnchorLayout:
         anchor_x: "center"
@@ -39,8 +36,10 @@
             height: 30
             Label:
                 text: "Budget Tracker"
+                color: app.hex_to_rgba("#EEEEEE")
+                bold: True
                 font_size: "18sp"
-     # Right AnchorLayout
+    # Right AnchorLayout
     AnchorLayout:
         anchor_x: "right"
         anchor_y: "top"
@@ -56,16 +55,19 @@
                 size_hint: None, None
                 size: 40, 30
                 font_name: app.font_path
+                hover_color: app.hex_to_rgba("#2B4257")
                 on_release: app.minimize_window()
             HoverableButton:
                 text: "\uE835"  # Maximize icon
                 size_hint: None, None
                 size: 40, 30
                 font_name: app.font_path
+                hover_color: app.hex_to_rgba("#2B4257")
                 on_release: app.maximize_window()
             HoverableButton:
                 text: "\uE5CD"  # Close icon
                 size_hint: None, None
                 size: 40, 30
                 font_name: app.font_path
+                hover_color: app.hex_to_rgba("#2B4257")
                 on_release: app.close_window()

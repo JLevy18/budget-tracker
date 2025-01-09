@@ -32,5 +32,5 @@ class ContentFactory:
         dashboard_view.ids.budget_view.add_widget(budget_view)
 
         return dashboard_view
-  
+
 

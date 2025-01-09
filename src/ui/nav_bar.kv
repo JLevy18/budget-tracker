@@ -1,0 +1,43 @@
+<HoverableButton>:
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<NavBar>:
+    anchor_x: "center"
+    anchor_y: "bottom"
+    AnchorLayout:
+        size_hint: None,0.5
+        BoxLayout:
+            orientation: "horizontal"
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                HoverableButton:
+                    text: "\uef3e"  # Minimize icon
+                    size_hint: None, None
+                    font_size: "32sp"
+                    size: 32, 32
+                    font_name: app.font_path_extralight
+                    hover_callback: app.change_font_path_callback
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                Label:
+                    text: "\u2022"  # Minimize icon
+                    size_hint: None, None
+                    font_size: "32sp"
+                    size: 32, 32
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                HoverableButton:
+                    text: "\uef63"  # Minimize icon
+                    size_hint: None, None
+                    font_size: "32sp"
+                    size: 32, 32
+                    font_name: app.font_path_extralight
+                    hover_callback: app.change_font_path_callback
