@@ -9,6 +9,7 @@ from kivy.config import Config
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.layout import Layout
+from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, FadeTransition
 from kivy.graphics import Color, Line
 
 from src.modules.app_bar import AppBar
@@ -16,7 +17,6 @@ from src.modules.nav_bar import NavBar
 from src.modules.content_area import ContentArea
 from src.modules.hover_behavior import HoverableButton
 from src.modules.classes.budget import Budget
-from src.content_factory import ContentFactory
 
 from ctypes import windll, Structure, c_int, byref
 
@@ -48,6 +48,9 @@ else:
 
 KV_DIR = os.path.join(base_path, "ui")
 Builder.load_file(os.path.join(KV_DIR, "budget_tracker.kv"))
+Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
+Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
+Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.set('graphics', 'resizable', True)
@@ -60,9 +63,8 @@ def initialize_app(base_dir, is_prod):
     """
     Initialize the application by ensuring directories exist and loading the budget.
     """
-    content_factory = ContentFactory()  # Initialize content factory
 
-    return BudgetTrackerApp(content_factory, is_prod=is_prod)
+    return BudgetTrackerApp(is_prod=is_prod)
 
 
 def print_widget_tree(widget, level=0):
@@ -82,10 +84,9 @@ class BudgetTrackerApp(App):
     """
     The Kivy App class that manages the application window and content.
     """
-    def __init__(self, content_factory, is_prod=False, **kwargs):
+    def __init__(self, is_prod=False, **kwargs):
         super().__init__(**kwargs)
-        self.content_factory = content_factory  # Factory for creating content pages
-        self.content_area = None
+        self.content_area = ContentArea()
         self.is_prod = is_prod
         self.outlines_enabled = True
         self.window_state = {
@@ -96,6 +97,7 @@ class BudgetTrackerApp(App):
         self.font_path = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded.ttf")
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
+        self.is_transitioning = False
         
     def change_font_path_callback(self, widget, state):
         if state == "enter":
@@ -121,26 +123,21 @@ class BudgetTrackerApp(App):
         hwnd = windll.user32.GetForegroundWindow()
         self.enable_shadow(hwnd)
 
-        if not self.is_prod:
-            Window.bind(on_key_down=self.on_key_down)
-
         root = BudgetTracker()
-        self.content_area = root.ids.content_area
-        self.load_page("dashboard")
-        toggle_outlines(root, self.outlines_enabled)
         return root
 
-    def load_page(self, page_name):
-        """Swap the content area to display a specific page."""
-        content = self.content_factory.create(page_name)
-        if content:
-            self.content_area.swap_content(content)
+    def switch_screen(self, screen_name):
+        """Switch to the specified screen."""
+        sm = self.root.ids.content_area
+        # Determine slide direction based on the target screen
+        if sm.current == "dashboard" and screen_name == "transaction":
+            sm.transition.direction = "left"  # Slide left when going to transaction
+        elif sm.current == "transaction" and screen_name == "dashboard":
+            sm.transition.direction = "right"  # Slide right when going back to dashboard
 
-    def on_key_down(self, window, key, scancode, codepoint, modifier):
-        """Handle key presses for toggling outlines."""
-        if key == 284:
-            self.outlines_enabled = not self.outlines_enabled
-            toggle_outlines(self.root, self.outlines_enabled)
+        # Switch screens only if the target screen is different
+        if sm.current != screen_name:
+            sm.current = screen_name
 
     def minimize_window(self):
         """Minimize the application window."""
@@ -210,46 +207,3 @@ class MARGINS(Structure):
 def enable_shadow(hwnd):
     margins = MARGINS(-1, -1, -1, -1)  # Extend the shadow into the entire window area
     windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))
-
-def add_outlines_to_layouts(widget, enable, level=0):
-    """Recursively add outlines to all layouts."""
-    if not enable:  # If outlines are disabled, clear all
-        clear_outlines(widget)
-        return
-
-    color, color_name = OUTLINE_COLORS[level % len(OUTLINE_COLORS)]
-    if level not in displayed_levels:  # Display level color only once
-        print(f"Level {level}: Color is {color_name}")
-        displayed_levels.add(level)
-
-    if isinstance(widget, Layout):
-        with widget.canvas.before:
-            Color(*color)  # Red outline color
-            Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1)
-        widget.bind(pos=lambda instance, value: update_outline(instance, color))
-        widget.bind(size=lambda instance, value: update_outline(instance, color))
-    
-    for child in widget.children:
-        add_outlines_to_layouts(child, enable, level + 1)
-
-def update_outline(widget, color):
-    """Update the outline to match the widget's size and position."""
-    widget.canvas.before.clear()
-    with widget.canvas.before:
-        Color(*color)  # Red outline color
-        Line(rectangle=(widget.x, widget.y, widget.width, widget.height), width=1)
-
-def clear_outlines(widget):
-    """Clear outlines from all layouts."""
-    if isinstance(widget, Layout):
-        widget.canvas.before.clear()
-    for child in widget.children:
-        clear_outlines(child)
-
-def toggle_outlines(widget, enable):
-    """Enable or disable outlines for all layouts."""
-    if enable:
-        add_outlines_to_layouts(widget, enable=True)  # Reuse the modified add_outlines_to_layouts function
-    else:
-        clear_outlines(widget)
-        displayed_levels.clear()

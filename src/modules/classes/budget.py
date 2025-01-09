@@ -16,7 +16,6 @@ class Budget:
         
         try:
             df = pd.read_csv(self.csv_path)
-            logging.info(f"Columns read from budget file: {df.columns.tolist()}")
         except Exception as e:
             logging.error(f"Failed to read budget file: {e}")
             raise

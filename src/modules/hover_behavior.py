@@ -56,9 +56,17 @@ class HoverBehavior(Widget):
                 self.canvas_rectangle = Rectangle(source=self.icon, pos=self.pos, size=self.size)
 
 class HoverableButton(Button, HoverBehavior):
+    action_callback = ObjectProperty(None, allownone=True)
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.bind(on_press=self._on_press_handler)
         if not self.icon:  # Use default behavior if no icon is provided
             self.background_normal = kwargs.get("background_normal", "")
             self.background_down = kwargs.get("background_down", "")
             self.background_color = kwargs.get("background_color", [0, 0, 0, 0])
+            
+    def _on_press_handler(self, *args):
+        """Call the action callback if provided."""
+        if self.action_callback:
+            self.action_callback(self)

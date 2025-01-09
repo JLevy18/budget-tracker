@@ -1,18 +1,30 @@
 from kivy.uix.boxlayout import BoxLayout
+from kivy.clock import Clock
 from src.modules.pie_chart import PieChart
 from src.modules.bar_graph import BarGraph
 from src.modules.radial_graph import RadialPercentageTracker
+from src.modules.classes.budget import Budget
+from src.ui.views.budget_view import BudgetView
 import matplotlib.pyplot as plt
 import random
+import os
+
+budgets_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data", "budgets")
+budgets_path = os.path.join(budgets_dir, "budget.csv")
 
 class DashboardView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Render pie charts in multiple widgets
+        Clock.schedule_once(self.initialize_widgets)
+
+    def initialize_widgets(self, *args):
+        # Safely access self.ids here
         self.add_pie_chart("budget_category_pie_chart")
         self.add_pie_chart("actual_category_pie_chart")
         self.add_radial_tracker("radial_budget_progress", budget_percentage=30)
         self.add_bar_graph("monthly_spending_summary")
+        self.add_budget_view("budget_view")
+
 
     def add_pie_chart(self, widget_id):
         pie_chart_area = self.ids[widget_id]
@@ -82,7 +94,18 @@ class DashboardView(BoxLayout):
         # Add the bar graph to the widget
         bar_graph_area.clear_widgets()
         bar_graph_area.add_widget(bar_graph)
+        
+    def add_budget_view(self, widget_id):
+        budget_view = BudgetView()
+        
+        budget = Budget(budgets_path)
+        budget_view.budget = budget
+        
+        budget_view_area = self.ids[widget_id]
+        budget_view_area.clear_widgets()
+        budget_view_area.add_widget(budget_view)
 
+        
 
 
 

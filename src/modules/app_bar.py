@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from kivy.properties import BooleanProperty
+from kivy.properties import BooleanProperty, ListProperty
 from src.modules.hover_behavior import HoverableButton
 from ctypes import windll, Structure, c_long, byref
 import os
@@ -83,7 +83,7 @@ def is_draggable(widget, touch):
 
     # Default: Disallow dragging for other widget types
     return False
-
+    
 class AppBar(BoxLayout):
     is_dragging = False
     drag_start_pos = None

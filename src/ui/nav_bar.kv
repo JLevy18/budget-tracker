@@ -23,6 +23,7 @@
                     size: 32, 32
                     font_name: app.font_path_extralight
                     hover_callback: app.change_font_path_callback
+                    on_press: app.switch_screen("dashboard")
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
@@ -41,3 +42,4 @@
                     size: 32, 32
                     font_name: app.font_path_extralight
                     hover_callback: app.change_font_path_callback
+                    on_press: app.switch_screen("transaction")
