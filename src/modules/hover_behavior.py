@@ -5,7 +5,6 @@ from kivy.uix.button import Button
 from kivy.graphics import Rectangle, Color
 
 class HoverBehavior(Widget):
-    icon = StringProperty("")
     is_hovered = BooleanProperty(False)
     hover_color = ListProperty([0, 0, 0, 0])
     normal_color = ListProperty([0, 0, 0, 0])
@@ -18,9 +17,6 @@ class HoverBehavior(Widget):
         self.background_normal = kwargs.get("background_normal", "")
         self.background_down = kwargs.get("background_down", "")
         self.background_color = kwargs.get("background_color", self.normal_color)
-        self.canvas_rectangle = None  # Track the Rectangle instance for custom icons
-        
-        self.bind(pos=self.update_canvas, size=self.update_canvas, icon=self.update_canvas)
 
 
     def on_mouse_move(self, window, pos):
@@ -52,14 +48,6 @@ class HoverBehavior(Widget):
         if self.hover_callback:
                 self.hover_callback(self, "leave")
 
-    def update_canvas(self, *args):
-        """Update the button's canvas to draw the custom icon if provided."""
-        self.canvas.before.clear()  # Clear previous instructions
-        if self.icon:  # Only draw the custom icon if it is provided
-            with self.canvas.before:
-                Color(1, 1, 1, 1)  # Ensure full opacity for the image
-                self.canvas_rectangle = Rectangle(source=self.icon, pos=self.pos, size=self.size)
-
 class HoverableButton(Button, HoverBehavior):
     action_callback = ObjectProperty(None, allownone=True)
     align_text_left = BooleanProperty(False)
@@ -67,19 +55,15 @@ class HoverableButton(Button, HoverBehavior):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.bind(on_press=self._on_press_handler)
-        if not self.icon:  # Use default behavior if no icon is provided
-            self.background_normal = kwargs.get("background_normal", "")
-            self.background_down = kwargs.get("background_down", "")
-            self.background_color = kwargs.get("background_color", [0, 0, 0, 0])
-            # Text alignment properties
-            self.text_size = (self.width, None)  # Default text size
-            self.halign = "center"  # Default to center alignment
-            self.valign = "middle"  # Vertically center the text
+        # Text alignment properties
+        self.text_size = (self.width, None)  # Default text size
+        self.halign = "center"  # Default to center alignment
+        self.valign = "middle"  # Vertically center the text
 
-            # Dynamically update alignment if `align_text_left` is enabled
-            self.bind(
-                align_text_left=self._update_alignment,
-                size=self._update_alignment,
+        # Dynamically update alignment if `align_text_left` is enabled
+        self.bind(
+            align_text_left=self._update_alignment,
+            size=self._update_alignment,
             )
 
     def _update_alignment(self, *args):

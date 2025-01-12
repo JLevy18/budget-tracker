@@ -1,87 +1,57 @@
 <AppBar>:
     orientation: "horizontal"
-    size_hint: 1, None
-    height: 40
-    AnchorLayout:
-        anchor_x: "left"
-        anchor_y: "top"
-        width: self.children[0].minimum_width
-        size_hint_x: 0.25
-        BoxLayout:  # Horizontal layout for the buttons
-            orientation: "horizontal"
-            size_hint_x: None
-            height: self.minimum_height
-            width: self.minimum_width
-            HoverableButton:
-                size_hint: None, None
-                size: 64, 64
-                icon: app.logo
-                change_cursor_on_hover: True
-                pos_hint: {"top": 1}
-            HoverableButton:
-                text: "File"
-                size_hint: None, None
-                size: 45, 25
-                pos_hint: {"top": 1}
-                hover_color: app.hex_to_rgba("#2B4257")
-                text_size: self.width - 5, self.height - 4  # Define the text area with padding
-                halign: "center"  # Horizontal alignment of the text
-                valign: "middle"  # Vertical alignment of the text
-                on_release: root.file_dropdown.open(self)
-            HoverableButton:
-                text: "Help"
-                size_hint: None, None
-                size: 45, 25
-                pos_hint: {"top": 1}
-                hover_color: app.hex_to_rgba("#2B4257")
-                text_size: self.width - 5, self.height - 4  # Define the text area with padding
-                halign: "center"  # Horizontal alignment of the text
-                valign: "middle"  # Vertical alignment of the text
-                on_release: root.help_dropdown.open(self)
-    AnchorLayout:
-        anchor_x: "center"
-        anchor_y: "top"
-        size_hint_x: 1
-        BoxLayout:
-            padding: [0,5,5,0]
-            orientation: "horizontal"
-            size_hint: None, None
-            width: 200
-            height: 30
-            Label:
-                text: "Budget Tracker"
-                color: app.hex_to_rgba("#EEEEEE")
-                bold: True
-                font_size: "18sp"
-    # Right AnchorLayout
-    AnchorLayout:
-        anchor_x: "right"
-        anchor_y: "top"
-        width: self.children[0].minimum_width
-        size_hint_x: 0.25
-        BoxLayout:  # Horizontal layout for the buttons
-            orientation: "horizontal"
-            size_hint: None, None
-            height: self.minimum_height  # Match the title bar height
-            width: self.minimum_width
-            HoverableButton:
-                text: "\uE15B"  # Minimize icon
-                size_hint: None, None
-                size: 40, 30
-                font_name: app.font_path
-                hover_color: app.hex_to_rgba("#2B4257")
-                on_release: app.minimize_window()
-            HoverableButton:
-                text: "\uE835"  # Maximize icon
-                size_hint: None, None
-                size: 40, 30
-                font_name: app.font_path
-                hover_color: app.hex_to_rgba("#2B4257")
-                on_release: app.maximize_window()
-            HoverableButton:
-                text: "\uE5CD"  # Close icon
-                size_hint: None, None
-                size: 40, 30
-                font_name: app.font_path
-                hover_color: app.hex_to_rgba("#2B4257")
-                on_release: app.close_window()
+    height: 30
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: None, 1
+        width: self.minimum_width
+
+        HoverableButton:
+            text: "File"
+            size_hint: None, 1
+            width: 60
+            hover_color: app.hex_to_rgba("#2B4257")
+            on_release: root.file_dropdown.open(self)
+        HoverableButton:
+            text: "Help"
+            size_hint: None, 1
+            width: 60
+            hover_color: app.hex_to_rgba("#2B4257")
+            on_release: root.help_dropdown.open(self)
+
+    Label:
+        id: title_bar
+        text: "Budget Tracker"
+        size_hint: 1, 1
+        halign: 'center'
+        valign: 'middle'
+        text_size: self.size
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: None, 1
+        width: self.minimum_width
+
+        HoverableButton:
+            text: "\uE15B"
+            size_hint: None, 1
+            width: 40
+            font_name: app.font_path
+            hover_color: app.hex_to_rgba("#2B4257")
+            on_release: app.minimize_window()
+
+        HoverableButton:
+            text: "\uE835"
+            size_hint: None, 1
+            width: 40
+            font_name: app.font_path
+            hover_color: app.hex_to_rgba("#2B4257")
+            on_release: app.maximize_window()
+
+        HoverableButton:
+            text: "\uE5CD"
+            size_hint: None, 1
+            width: 40
+            font_name: app.font_path
+            hover_color: app.hex_to_rgba("#2B4257")
+            on_release: app.close_window()

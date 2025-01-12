@@ -1,11 +1,19 @@
 <BudgetTracker>:
     orientation: 'vertical'
-    AnchorLayout:
-        anchor_y: "top"
+    FloatLayout:
         size_hint: 1, None
-        height: self.children[0].height
+        height: 30
+        AppBar:
+            height: 30
+            pos_hint: {"top": 1}
+            id: app_bar
+    FloatLayout:
+        size_hint: 1, None
+        height: 30
         NavBar:
+            pos_hint: {"top": 1}
     ContentArea:
+        size_hint: 1,1
         id: content_area
 
 <ContentArea>:

@@ -20,20 +20,6 @@ from src.modules.classes.budget import Budget
 
 from ctypes import windll, Structure, c_int, byref
 
-def import_action():
-    print("Import selected")
-
-def export_action():
-    print("Export selected")
-
-file_menu_items = [
-    {"text": "Import", "action": import_action},
-    {"text": "Export", "action": export_action},
-    {"is_separator": True},  # Separator
-    {"text": "Settings", "action": None},
-    {"text": "Check for updates", "action": None},
-]
-
 # Determine base paths
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
     base_path = sys._MEIPASS
@@ -42,6 +28,7 @@ else:
 
 KV_DIR = os.path.join(base_path, "ui")
 Builder.load_file(os.path.join(KV_DIR, "budget_tracker.kv"))
+Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
@@ -50,8 +37,6 @@ Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.set('graphics', 'resizable', True)
 Config.set('graphics', 'dpi', 'auto')
 Config.set('kivy', 'window', 'sdl2')
-Config.set('graphics', 'show_fps', '1')
-Config.set('modules', 'monitor', '1')
 
 def initialize_app(base_dir, is_prod):
     """
@@ -59,17 +44,6 @@ def initialize_app(base_dir, is_prod):
     """
 
     return BudgetTrackerApp(is_prod=is_prod)
-
-
-def print_widget_tree(widget, level=0):
-    """
-    Recursively print the widget tree for debugging purposes.
-    """
-    prefix = " " * (level * 2)
-    print(f"{prefix}{widget.__class__.__name__}: {widget}")
-    if hasattr(widget, 'children') and widget.children:
-        for child in reversed(widget.children):  # Reversed to match widget rendering order
-            print_widget_tree(child, level + 1)
 
 class BudgetTracker(BoxLayout):
     pass
@@ -81,7 +55,6 @@ class BudgetTrackerApp(App):
         super().__init__(**kwargs)
         self.content_area = ContentArea()
         self.is_prod = is_prod
-        self.outlines_enabled = True
         self.window_state = {
             "size": Window.size,
             "pos": (Window.left, Window.top),
@@ -100,15 +73,14 @@ class BudgetTrackerApp(App):
 
     def build(self):
 
-
         root = BudgetTracker()
         appbar = root.ids.app_bar
         appbar.app = self
-
+        titlebar = appbar.ids.title_bar
         Window.clearcolor = self.hex_to_rgba("#14202E")
-        Window.borderless = False
+        Window.borderless = True
         Window.custom_titlebar = True
-        Window.set_custom_titlebar(appbar)
+        Window.set_custom_titlebar(titlebar)
         Window.set_icon(self.logo)
         Window.size = (1280, 720)
         Window.minimum_width = 854
@@ -198,7 +170,3 @@ class MARGINS(Structure):
                 ("cxRightWidth", c_int),
                 ("cyTopHeight", c_int),
                 ("cyBottomHeight", c_int)]
-
-def enable_shadow(hwnd):
-    margins = MARGINS(-1, -1, -1, -1)  # Extend the shadow into the entire window area
-    windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, byref(margins))

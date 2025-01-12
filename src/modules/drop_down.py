@@ -1,4 +1,6 @@
 from kivy.app import App
+from kivy.core.window import Window
+from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -25,7 +27,7 @@ class DynamicDropDown(DropDown):
         self.auto_width = False
         
         with self.canvas.before:
-            Color(rgba=self.app.hex_to_rgba("#2B4257"))  # Background color
+            Color(rgba=self.app.hex_to_rgba("#14202E"))  # Background color
             self.background_rect = Rectangle(size=self.size, pos=self.pos)
 
         # Bind the dropdown size and position to the background rectangle
@@ -41,7 +43,6 @@ class DynamicDropDown(DropDown):
             else:
                 button = self._create_menu_button(item["text"], item["action"])
                 self.add_widget(button)
-                print(f"Added button to dropdown: {button}, type: {type(button)}")
                 
         # Adjust the dropdown size based on the number of children
         self._adjust_dropdown_size()
@@ -66,10 +67,10 @@ class DynamicDropDown(DropDown):
             align_text_left=True,
             size_hint=(None, None),
             size=(self._button_width, self._button_height),
+            hover_color= self.app.hex_to_rgba("#2B4257"),
             font_size=self._font_size,  # Smaller font size
             on_release=lambda *args: (action() if action else None, self.dismiss()),
         )
-        print(f"Created button: {button}, type: {type(button)}")
         return button
 
     def _create_separator(self):
