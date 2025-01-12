@@ -1,14 +1,6 @@
-<HoverableButton>:
-    canvas.before:
-        Color:
-            rgba: self.background_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
 <NavBar>:
     anchor_x: "center"
-    anchor_y: "bottom"
+    anchor_y: "center"
     AnchorLayout:
         size_hint: None,0.5
         BoxLayout:
@@ -22,6 +14,7 @@
                     font_size: "32sp"
                     size: 32, 32
                     font_name: app.font_path_extralight
+                    change_cursor_on_hover: True
                     hover_callback: app.change_font_path_callback
                     on_press: app.switch_screen("dashboard")
             AnchorLayout:
@@ -41,5 +34,6 @@
                     font_size: "32sp"
                     size: 32, 32
                     font_name: app.font_path_extralight
+                    change_cursor_on_hover: True
                     hover_callback: app.change_font_path_callback
                     on_press: app.switch_screen("transaction")

@@ -15,6 +15,8 @@ budgets_path = os.path.join(budgets_dir, "budget.csv")
 class DashboardView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        labels = ["Category A", "Category B", "Category C", "Category D"]
+        self.data = [random.randint(10, 100) for _ in labels]
         Clock.schedule_once(self.initialize_widgets)
 
     def initialize_widgets(self, *args):
@@ -37,8 +39,7 @@ class DashboardView(BoxLayout):
             self.render_pie_chart(widget_id)
 
     def render_pie_chart(self, widget_id):
-        labels = ["Category A", "Category B", "Category C", "Category D"]
-        data = [random.randint(10, 100) for _ in labels]
+        plt.close("all")
         colors = ["#116530", "#21B6A8", "#A3EBB1", "#18A558"]
 
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -52,11 +53,11 @@ class DashboardView(BoxLayout):
         
         ax.set_facecolor("none")
 
-        wedges, _ = ax.pie(data, labels=None, startangle=90, colors=colors)
+        wedges, _ = ax.pie(self.data, labels=None, startangle=90, colors=colors)
         ax.axis("equal")
 
         # Assign data values to wedges
-        for wedge, value in zip(wedges, data):
+        for wedge, value in zip(wedges, self.data):
             wedge.data_value = value  # Assign data to the wedge
 
         pie_chart_widget = PieChart(fig)

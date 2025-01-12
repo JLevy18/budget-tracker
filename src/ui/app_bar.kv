@@ -1,33 +1,47 @@
-<HoverableButton>:
-    canvas.before:
-        Color:
-            rgba: self.background_color
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
 <AppBar>:
     orientation: "horizontal"
     size_hint: 1, None
-    # Left AnchorLayout (Empty for now)
+    height: 40
     AnchorLayout:
         anchor_x: "left"
         anchor_y: "top"
-        padding: [5,5,5,5]
+        width: self.children[0].minimum_width
         size_hint_x: 0.25
-        BoxLayout:
+        BoxLayout:  # Horizontal layout for the buttons
             orientation: "horizontal"
-            size: 64, 64
-            size_hint: None, None
+            size_hint_x: None
+            height: self.minimum_height
+            width: self.minimum_width
             HoverableButton:
+                size_hint: None, None
                 size: 64, 64
                 icon: app.logo
-
+                change_cursor_on_hover: True
+                pos_hint: {"top": 1}
+            HoverableButton:
+                text: "File"
+                size_hint: None, None
+                size: 45, 25
+                pos_hint: {"top": 1}
+                hover_color: app.hex_to_rgba("#2B4257")
+                text_size: self.width - 5, self.height - 4  # Define the text area with padding
+                halign: "center"  # Horizontal alignment of the text
+                valign: "middle"  # Vertical alignment of the text
+                on_release: root.file_dropdown.open(self)
+            HoverableButton:
+                text: "Help"
+                size_hint: None, None
+                size: 45, 25
+                pos_hint: {"top": 1}
+                hover_color: app.hex_to_rgba("#2B4257")
+                text_size: self.width - 5, self.height - 4  # Define the text area with padding
+                halign: "center"  # Horizontal alignment of the text
+                valign: "middle"  # Vertical alignment of the text
+                on_release: root.help_dropdown.open(self)
     AnchorLayout:
         anchor_x: "center"
         anchor_y: "top"
         size_hint_x: 1
-        height: 50
         BoxLayout:
             padding: [0,5,5,0]
             orientation: "horizontal"

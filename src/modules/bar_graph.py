@@ -70,7 +70,7 @@ class BarGraph(FigureCanvasKivyAgg):
         y_labels[0] = ""  # Make the first label invisible
         y_labels[-1] = ""  # Make the last label invisible
         self.ax.set_yticks(y_ticks)  # Set only the ticks from the second value onward
-        self.ax.set_yticklabels(y_labels, fontsize=8, color="#FFFFFF", va="center")
+        self.ax.set_yticklabels(y_labels, fontsize=8, color="#FFFFFF", va="center", x=0.02)
         
 
         # Customize the axes

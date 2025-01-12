@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.properties import BooleanProperty, ListProperty
 from src.modules.hover_behavior import HoverableButton
+from src.modules.drop_down import DynamicDropDown, import_action, export_action, about_action
 from ctypes import windll, Structure, c_long, byref
 import os
 import sys
@@ -24,37 +25,24 @@ Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
 class POINT(Structure):
     _fields_ = [("x", c_long), ("y", c_long)]
 
+
+file_menu_items = [
+    {"text": "Import", "action": import_action},
+    {"text": "Export", "action": export_action},
+    {"is_separator": True},  # Separator
+    {"text": "Settings", "action": None},
+    {"text": "Check for updates", "action": None},
+]
+
+help_menu_items = [
+    {"text": "About", "action": about_action},
+]
+
 def get_cursor_pos():
     """Get the global cursor position in DPI-aware coordinates."""
     point = POINT()
     windll.user32.GetCursorPos(byref(point))
     return point.x, point.y
-
-def get_tallest_child_with_padding(widget):
-    """Recursively find the tallest child with an explicit height and its padding."""
-    if hasattr(widget, "children") and widget.children:
-        tallest_height = 0
-        padding_top = 0
-        padding_bottom = 0
-
-        for child in widget.children:
-            child_height, child_padding_top, child_padding_bottom = get_tallest_child_with_padding(child)
-            if child_height > tallest_height:
-                tallest_height = child_height
-                padding_top = child_padding_top
-                padding_bottom = child_padding_bottom
-
-        # If the widget itself has padding (e.g., it's a layout), use its padding
-        if hasattr(widget, "padding") and isinstance(widget.padding, (list, tuple)):
-            padding_top += widget.padding[1] if len(widget.padding) > 1 else 0
-            padding_bottom += widget.padding[3] if len(widget.padding) > 3 else 0
-
-        return tallest_height, padding_top, padding_bottom
-
-    elif hasattr(widget, "height") and widget.size_hint_y is None:
-        return widget.height, 0, 0  # Fixed height, no padding
-
-    return 0, 0, 0  # Default to 0 if no valid height is found
 
 def get_youngest_child(widget, touch):
     """Recursively find the youngest (deepest) child that collides with the touch point."""
@@ -83,26 +71,22 @@ def is_draggable(widget, touch):
 
     # Default: Disallow dragging for other widget types
     return False
-    
+
+
 class AppBar(BoxLayout):
     is_dragging = False
     drag_start_pos = None
     initial_window_pos = None
 
-    def on_size(self, *args):
-        """Dynamically adjust TitleBar height based on its tallest child plus padding."""
-        # Calculate the tallest child and padding
-        tallest_child_height, padding_top, padding_bottom = get_tallest_child_with_padding(self)
-
-        # Add padding to the total height
-        total_height = tallest_child_height + padding_top + padding_bottom
-
-        # Update the height of the TitleBar
-        self.height = total_height
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Create dropdowns
+        self.file_dropdown = DynamicDropDown(menu_items=file_menu_items)
+        self.help_dropdown = DynamicDropDown(menu_items=help_menu_items)
 
     def on_touch_down(self, touch):
         local_pos = self.to_widget(*touch.pos)
-
+    
         if self.collide_point(*local_pos):
             # Check if the touch is on a draggable widget
             if is_draggable(self, touch):
@@ -118,6 +102,7 @@ class AppBar(BoxLayout):
                 return super().on_touch_down(touch)
 
         return super().on_touch_down(touch)
+    
     def on_touch_move(self, touch):
         # Drag the window if dragging is active
         if self.is_dragging:

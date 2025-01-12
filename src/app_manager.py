@@ -20,25 +20,19 @@ from src.modules.classes.budget import Budget
 
 from ctypes import windll, Structure, c_int, byref
 
+def import_action():
+    print("Import selected")
 
+def export_action():
+    print("Export selected")
 
-OUTLINE_COLORS = [
-    ((1, 0, 0, 1), "Red"),        # Red
-    ((1, 0.5, 0, 1), "Orange"),    # Orange
-    ((1, 1, 0, 1), "Yellow"),     # Yellow
-    ((0, 1, 0, 1), "Green"),      # Green
-    ((0, 0, 1, 1), "Blue"),       # Blue
-    ((0, 1, 1, 1), "Cyan"),       # Cyan
-    ((0.5, 0, 0.5, 1), "Purple"),  # Purple
-    ((1, 0, 1, 1), "Magenta"),    # Magenta
-    ((0.5, 0.5, 0.5, 1), "Gray"), # Gray
-    
-    ((0.5, 0, 0, 1), "Dark Red"), # Dark Red
-    ((0, 0.5, 0, 1), "Dark Green"), # Dark Green
-    ((0, 0, 0.5, 1), "Dark Blue"), # Dark Blue
+file_menu_items = [
+    {"text": "Import", "action": import_action},
+    {"text": "Export", "action": export_action},
+    {"is_separator": True},  # Separator
+    {"text": "Settings", "action": None},
+    {"text": "Check for updates", "action": None},
 ]
-
-displayed_levels = set({0,1,2,3,4,5,6,7,8})
 
 # Determine base paths
 if getattr(sys, "frozen", False):  # If running in a PyInstaller bundle
@@ -79,7 +73,6 @@ def print_widget_tree(widget, level=0):
 
 class BudgetTracker(BoxLayout):
     pass
-
 class BudgetTrackerApp(App):
     """
     The Kivy App class that manages the application window and content.
@@ -107,11 +100,14 @@ class BudgetTrackerApp(App):
 
     def build(self):
 
+
+        root = BudgetTracker()
+        appbar = root.ids.app_bar
+        appbar.app = self
+
         Window.clearcolor = self.hex_to_rgba("#14202E")
         Window.borderless = False
         Window.custom_titlebar = True
-        appbar = AppBar()
-        appbar.app = self
         Window.set_custom_titlebar(appbar)
         Window.set_icon(self.logo)
         Window.size = (1280, 720)
@@ -123,7 +119,6 @@ class BudgetTrackerApp(App):
         hwnd = windll.user32.GetForegroundWindow()
         self.enable_shadow(hwnd)
 
-        root = BudgetTracker()
         return root
 
     def switch_screen(self, screen_name):
