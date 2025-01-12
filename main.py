@@ -3,17 +3,10 @@ import sys
 import logging
 from src import logging_config
 from src.app_manager import initialize_app
+from src.data_manager import set_data_manager
 
 # Default to DEV mode
 IS_PROD = False
-
-def create_directories(base_dir, is_prod):
-    # Directory structure
-    directories = ["budgets", "statements", "transactions"]
-
-    for dir_name in directories:
-        path = os.path.join(base_dir, "data", dir_name)
-        os.makedirs(path, exist_ok=True)
 
 def check_logs_directory(logs_dir):
     if not os.path.exists(logs_dir):
@@ -32,9 +25,6 @@ def main():
     # Set base directory
     base_dir = os.path.expandvars(r"%appdata%\BudgetTracker") if is_prod else os.path.join("src")
 
-    # Create necessary directories
-    create_directories(base_dir, is_prod)
-
     # Check logs directory only in PROD mode
     logs_dir = os.path.join(os.path.dirname(sys.argv[0]), "Logs") if is_prod else None
     if is_prod:
@@ -43,7 +33,8 @@ def main():
     logging_config.setup_logging("PROD" if is_prod else "DEV")
 
     # Launch the dashboard
-    app = initialize_app(base_dir, is_prod)
+    data_manager, app = initialize_app(base_dir, is_prod)
+    set_data_manager(data_manager)
     app.run()
 
 if __name__ == "__main__":

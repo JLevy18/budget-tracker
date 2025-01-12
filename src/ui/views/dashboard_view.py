@@ -98,10 +98,7 @@ class DashboardView(BoxLayout):
         
     def add_budget_view(self, widget_id):
         budget_view = BudgetView()
-        
-        budget = Budget(budgets_path)
-        budget_view.budget = budget
-        
+
         budget_view_area = self.ids[widget_id]
         budget_view_area.clear_widgets()
         budget_view_area.add_widget(budget_view)

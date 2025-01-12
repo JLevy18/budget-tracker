@@ -17,7 +17,7 @@ from src.modules.app_bar import AppBar
 from src.modules.nav_bar import NavBar
 from src.modules.content_area import ContentArea
 from src.modules.hover_behavior import HoverableButton
-from src.modules.classes.budget import Budget
+from src.data_manager import DataManager, set_data_manager
 
 from ctypes import windll, Structure, c_int, byref
 
@@ -41,18 +41,31 @@ Config.set('kivy', 'window', 'sdl2')
 
 def initialize_app(base_dir, is_prod):
     """
-    Initialize the application by ensuring directories exist and loading the budget.
+    Initialize the application by setting up the data manager and returning the app instance.
     """
+    # Initialize the data manager
+    data_manager = DataManager(base_dir, is_prod)
+    
+    # Load profiles or create default if none exist
+    profiles = data_manager.get_profiles()
+    if not profiles:
+        default_file = data_manager.create_new_profile(income=5000.00)
+        data_manager.load_data(default_file)
+    else:
+        # Set the first profile as the active one by default
+        data_manager.load_data(profiles[0]["path"])
 
-    return BudgetTrackerApp(is_prod=is_prod)
+    # Pass the data manager to the app
+    app = BudgetTrackerApp(data_manager=data_manager, is_prod=is_prod)
 
+    return data_manager, app
 class BudgetTracker(BoxLayout):
     pass
 class BudgetTrackerApp(App):
     """
     The Kivy App class that manages the application window and content.
     """
-    def __init__(self, is_prod=False, **kwargs):
+    def __init__(self, data_manager, is_prod=False, **kwargs):
         super().__init__(**kwargs)
         self.content_area = ContentArea()
         self.is_prod = is_prod
@@ -66,6 +79,8 @@ class BudgetTrackerApp(App):
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
         self.is_transitioning = False
+        
+        set_data_manager(data_manager)
     
     
     def toggle_background_colors(self):

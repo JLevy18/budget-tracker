@@ -1,23 +1,22 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.properties import ObjectProperty
+from src.data_manager import get_data_manager
 
 
 class BudgetView(BoxLayout):
-    budget = ObjectProperty(None) 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.bind(budget=self.on_budget_assigned)
+        self.populate_budget()
 
-    def on_budget_assigned(self, instance, value):
-        """Called when the budget is set."""
-        if value is not None:
-            self.populate_budget(value)
+    def populate_budget(self):
+        data_manager = get_data_manager()
+        budget_data = data_manager.get_budget()
 
-    def populate_budget(self, budget):
         budget_info = self.ids.budget_info
-        for _, row in budget.budget_df.iterrows():
-            budget_info.add_widget(Label(text=row["Category"]))
-            budget_info.add_widget(Label(text=row["Name"]))
-            budget_info.add_widget(Label(text=str(row["Cost per Month"])))
+        budget_info.clear_widgets()
+        for category, name, cost in zip(
+            budget_data["Category"], budget_data["Name"], budget_data["Cost per Month"]
+        ):
+            budget_info.add_widget(Label(text=category))
+            budget_info.add_widget(Label(text=name))
+            budget_info.add_widget(Label(text=f"${cost:.2f}"))
