@@ -10,19 +10,21 @@
                 anchor_x: "center"
                 anchor_y: "center"
                 HoverableButton:
+                    id: dashboard_button
                     text: "\uef3e"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
                     font_name: app.font_path_extralight
                     change_cursor_on_hover: True
-                    hover_callback: app.change_font_path_callback
-                    on_press: app.switch_screen("dashboard")
+                    hover_callback: root.change_font_path_callback
+                    on_press: root.select_button(self); app.switch_screen("dashboard")
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
                 Label:
-                    text: "\u2022"
+                    markup: True
+                    text: "[color=#C7C7C7]\u2022[/color]"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
@@ -36,13 +38,14 @@
                     size: 32, 32
                     font_name: app.font_path_extralight
                     change_cursor_on_hover: True
-                    hover_callback: app.change_font_path_callback
-                    on_press: app.switch_screen("transaction")
+                    hover_callback: root.change_font_path_callback
+                    on_press: root.select_button(self); app.switch_screen("transaction")
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
                 Label:
-                    text: "\u2022"
+                    markup: True
+                    text: "[color=#C7C7C7]\u2022[/color]"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
@@ -56,5 +59,5 @@
                     size: 32, 32
                     font_name: app.font_path_extralight
                     change_cursor_on_hover: True
-                    hover_callback: app.change_font_path_callback
-                    on_press: app.switch_screen("settings")
+                    hover_callback: root.change_font_path_callback
+                    on_press: root.select_button(self); app.switch_screen("settings")

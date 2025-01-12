@@ -9,6 +9,7 @@ from src.ui.views.budget_view import BudgetView
 import matplotlib.pyplot as plt
 import random
 import os
+import threading
 
 budgets_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data", "budgets")
 budgets_path = os.path.join(budgets_dir, "budget.csv")
@@ -16,6 +17,8 @@ budgets_path = os.path.join(budgets_dir, "budget.csv")
 class DashboardView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.data_manager = get_data_manager()
+        self.data_manager.bind(on_budget_change=self.on_budget_updated)
         Clock.schedule_once(self.initialize_widgets)
 
     def initialize_widgets(self, *args):
@@ -26,48 +29,48 @@ class DashboardView(BoxLayout):
         self.add_bar_graph("monthly_spending_summary")
         self.add_budget_view("budget_view")
 
+    def on_budget_updated(self, *args):
+        """
+        Handle budget updates and refresh the pie charts.
+        """
+        threading.Thread(target=self.calculate_pie_chart_data, daemon=True).start()
 
-    def add_pie_chart(self, widget_id):
-        pie_chart_area = self.ids[widget_id]
+    def calculate_pie_chart_data(self):
+        """
+        Perform pie chart calculations in a background thread.
+        """
+        # Perform data preparation asynchronously
+        self.data_manager.assign_category_colors()
+        budget_data = self.data_manager.get_budget()
+        labels = budget_data["Category"]
+        values = budget_data["Cost per Month"]
+        percentages = self.data_manager.get_category_percentages()
+        colors = [self.data_manager.get_category_color(category) for category in labels]
 
-        # Wait until the widget has valid dimensions
-        pie_chart_area.bind(size=lambda instance, size: self.on_widget_ready(instance, size, widget_id))
+        # Schedule the rendering on the main thread
+        Clock.schedule_once(lambda dt: self.render_pie_chart("budget_category_pie_chart", labels, values, percentages, colors))
+        Clock.schedule_once(lambda dt: self.render_pie_chart("actual_category_pie_chart", labels, values, percentages, colors))
 
-    def on_widget_ready(self, instance, size, widget_id):
-        if size[0] > 0 and size[1] > 0:  # Ensure size is valid
-            self.render_pie_chart(widget_id)
-
-    def render_pie_chart(self, widget_id):
+    def render_pie_chart(self, widget_id, labels, values, percentages, colors):
+        """
+        Render and update the pie chart on the main thread.
+        """
         plt.close("all")
 
-        # Access the DataManager
-        data_manager = get_data_manager()
-        
-        data_manager.assign_category_colors()
-
-        # Fetch category data
-        budget_data = data_manager.get_budget()
-        labels = budget_data["Category"]
-        percentages = data_manager.get_category_percentages()
-        values = budget_data["Cost per Month"]
-
-        # Fetch colors for categories
-        colors = [data_manager.get_category_color(category) for category in labels]
-
+        # Create the Matplotlib figure
         fig, ax = plt.subplots(figsize=(5, 5))
         fig.patch.set_facecolor("none")
         fig.subplots_adjust(left=0, right=1, top=0.8, bottom=0)
 
         if widget_id == "budget_category_pie_chart":
             ax.set_title("Budgeted", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
-        if widget_id == "actual_category_pie_chart":
+        elif widget_id == "actual_category_pie_chart":
             ax.set_title("Actual", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
         ax.set_facecolor("none")
 
-        # Render the pie chart without displaying labels or autopct
         wedges, _ = ax.pie(values, startangle=90, colors=colors)
 
-        # Assign data values and percentages to the wedges
+        # Attach metadata to wedges
         for wedge, value, percentage in zip(wedges, values, percentages):
             wedge.data_value = value
             wedge.data_percentage = percentage
@@ -76,6 +79,14 @@ class DashboardView(BoxLayout):
         pie_chart_area = self.ids[widget_id]
         pie_chart_area.clear_widgets()
         pie_chart_area.add_widget(pie_chart_widget)
+
+    def add_pie_chart(self, widget_id):
+        pie_chart_area = self.ids[widget_id]
+        pie_chart_area.bind(size=lambda instance, size: self.on_widget_ready(instance, size, widget_id))
+
+    def on_widget_ready(self, instance, size, widget_id):
+        if size[0] > 0 and size[1] > 0:  # Ensure size is valid
+            threading.Thread(target=self.calculate_pie_chart_data, daemon=True).start()
 
     def add_radial_tracker(self, widget_id, budget_percentage):
         tracker_area = self.ids[widget_id]

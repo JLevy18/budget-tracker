@@ -10,13 +10,13 @@ class BudgetView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
+        self.data_manager = get_data_manager()
         self.active_text_input = None
         self.last_saved_value = None
         self.populate_budget()
-
+    
     def populate_budget(self):
-        data_manager = get_data_manager()
-        budget_data = data_manager.get_budget()
+        budget_data = self.data_manager.get_budget()
 
         budget_info = self.ids.budget_info
         budget_info.clear_widgets()
@@ -166,8 +166,7 @@ class BudgetView(BoxLayout):
             new_value = self.last_saved_value
 
         # Update the data in the DataManager
-        data_manager = get_data_manager()
-        budget_data = data_manager.get_budget()
+        budget_data = self.data_manager.get_budget()
         if column_name == "Category":
             budget_data["Category"][row_index] = new_value
         elif column_name == "Name":
@@ -184,7 +183,7 @@ class BudgetView(BoxLayout):
                 new_value = f"${value_as_float:.2f}"
 
         # Save the updated data back to the data file
-        data_manager.set_budget(budget_data)
+        self.data_manager.set_budget(budget_data)
 
         # Replace the TextInput with a new Label at the same index
         layout.remove_widget(widget)

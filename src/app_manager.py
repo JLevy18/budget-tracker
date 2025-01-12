@@ -45,6 +45,7 @@ def initialize_app(base_dir, is_prod):
     """
     # Initialize the data manager
     data_manager = DataManager(base_dir, is_prod)
+    set_data_manager(data_manager)
     
     # Load profiles or create default if none exist
     profiles = data_manager.get_profiles()
@@ -56,7 +57,7 @@ def initialize_app(base_dir, is_prod):
         data_manager.load_data(profiles[0]["path"])
 
     # Pass the data manager to the app
-    app = BudgetTrackerApp(data_manager=data_manager, is_prod=is_prod)
+    app = BudgetTrackerApp(is_prod=is_prod)
 
     return data_manager, app
 class BudgetTracker(BoxLayout):
@@ -65,7 +66,7 @@ class BudgetTrackerApp(App):
     """
     The Kivy App class that manages the application window and content.
     """
-    def __init__(self, data_manager, is_prod=False, **kwargs):
+    def __init__(self, is_prod=False, **kwargs):
         super().__init__(**kwargs)
         self.content_area = ContentArea()
         self.is_prod = is_prod
@@ -79,8 +80,6 @@ class BudgetTrackerApp(App):
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
         self.is_transitioning = False
-        
-        set_data_manager(data_manager)
     
     
     def toggle_background_colors(self):
@@ -105,12 +104,6 @@ class BudgetTrackerApp(App):
         # Recurse for child widgets
         for child in widget.children:
             self.apply_background_colors(child)
-                
-    def change_font_path_callback(self, widget, state):
-        if state == "enter":
-            widget.font_name = self.font_path
-        elif state == "leave":
-            widget.font_name = self.font_path_extralight
 
     def build(self):
 

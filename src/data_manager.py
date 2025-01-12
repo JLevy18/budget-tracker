@@ -3,6 +3,8 @@ import pickle
 import uuid
 import logging
 import random
+from kivy.event import EventDispatcher
+from kivy.properties import ObjectProperty
 
 data_manager_instance = None
 
@@ -15,13 +17,16 @@ def get_data_manager():
         raise ValueError("DataManager instance has not been initialized.")
     return data_manager_instance
 
-class DataManager:
+class DataManager(EventDispatcher):
+    __events__ = ["on_budget_change"]
     
+    budget_data = ObjectProperty()
+
     COLOR_PALETTE = [
         "#116530", "#21B6A8", "#A3EBB1", "#18A558", "#145DA0", "#2E8BC0",
         "#B1D4E0", "#189AB4", "#75E6DA", "#10564F"
     ]
-    
+
     def __init__(self, base_dir, is_prod):
         self.category_colors = {}
         self.base_dir = base_dir
@@ -29,6 +34,7 @@ class DataManager:
         os.makedirs(self.data_dir, exist_ok=True)
         self.file_path = None
         self.active_profile = None
+        
 
     def create_new_profile(self, profile_name=None, income=0.0):
         profile_name = profile_name or "Default Profile"
@@ -151,7 +157,14 @@ class DataManager:
             raise ValueError("No active profile loaded.")
         self.active_profile["data"] = new_budget
         self.save_data(self.file_path, self.active_profile)
-        logging.info("Budget data updated.")
+        
+        self.dispatch("on_budget_change")
+    
+    def on_budget_change(self):
+        """
+        Event triggered when the budget changes.
+        """
+        pass
     
     def get_total_budget(self):
         """
