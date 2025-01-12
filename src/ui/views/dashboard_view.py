@@ -1,5 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
+from src.data_manager import get_data_manager
 from src.modules.pie_chart import PieChart
 from src.modules.bar_graph import BarGraph
 from src.modules.radial_graph import RadialPercentageTracker
@@ -15,8 +16,6 @@ budgets_path = os.path.join(budgets_dir, "budget.csv")
 class DashboardView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        labels = ["Category A", "Category B", "Category C", "Category D"]
-        self.data = [random.randint(10, 100) for _ in labels]
         Clock.schedule_once(self.initialize_widgets)
 
     def initialize_widgets(self, *args):
@@ -40,25 +39,38 @@ class DashboardView(BoxLayout):
 
     def render_pie_chart(self, widget_id):
         plt.close("all")
-        colors = ["#116530", "#21B6A8", "#A3EBB1", "#18A558"]
+
+        # Access the DataManager
+        data_manager = get_data_manager()
+        
+        data_manager.assign_category_colors()
+
+        # Fetch category data
+        budget_data = data_manager.get_budget()
+        labels = budget_data["Category"]
+        percentages = data_manager.get_category_percentages()
+        values = budget_data["Cost per Month"]
+
+        # Fetch colors for categories
+        colors = [data_manager.get_category_color(category) for category in labels]
 
         fig, ax = plt.subplots(figsize=(5, 5))
         fig.patch.set_facecolor("none")
         fig.subplots_adjust(left=0, right=1, top=0.8, bottom=0)
-        
+
         if widget_id == "budget_category_pie_chart":
             ax.set_title("Budgeted", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
-        elif widget_id == "actual_category_pie_chart":
+        if widget_id == "actual_category_pie_chart":
             ax.set_title("Actual", fontsize=12, fontweight="bold", color="#FFFFFF", pad=10)
-        
         ax.set_facecolor("none")
 
-        wedges, _ = ax.pie(self.data, labels=None, startangle=90, colors=colors)
-        ax.axis("equal")
+        # Render the pie chart without displaying labels or autopct
+        wedges, _ = ax.pie(values, startangle=90, colors=colors)
 
-        # Assign data values to wedges
-        for wedge, value in zip(wedges, self.data):
-            wedge.data_value = value  # Assign data to the wedge
+        # Assign data values and percentages to the wedges
+        for wedge, value, percentage in zip(wedges, values, percentages):
+            wedge.data_value = value
+            wedge.data_percentage = percentage
 
         pie_chart_widget = PieChart(fig)
         pie_chart_area = self.ids[widget_id]

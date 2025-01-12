@@ -42,7 +42,7 @@ class PieChart(FigureCanvasKivyAgg):
         pass
 
     def highlight_section(self, wedge):
-        """Enlarge the hovered section and display its value."""
+        """Highlight the hovered section and display its value."""
         if self.hovered_section == wedge:
             return  # Already highlighted
 
@@ -55,8 +55,7 @@ class PieChart(FigureCanvasKivyAgg):
         self.hovered_section = wedge
 
         # Display the value inside the wedge
-        total_data = sum([w.data_value for w in self.ax.patches if hasattr(w, "data_value")])
-        percentage = (wedge.data_value / total_data) * 100 if total_data > 0 else 0
+        percentage = wedge.data_percentage
         theta_mid = (wedge.theta1 + wedge.theta2) / 2  # Middle angle of the wedge
         radius = wedge.r * 0.6  # Adjust the radius multiplier for better positioning
 

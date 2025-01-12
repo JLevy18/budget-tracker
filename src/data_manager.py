@@ -2,6 +2,7 @@ import os
 import pickle
 import uuid
 import logging
+import random
 
 data_manager_instance = None
 
@@ -15,7 +16,14 @@ def get_data_manager():
     return data_manager_instance
 
 class DataManager:
+    
+    COLOR_PALETTE = [
+        "#116530", "#21B6A8", "#A3EBB1", "#18A558", "#145DA0", "#2E8BC0",
+        "#B1D4E0", "#189AB4", "#75E6DA", "#10564F"
+    ]
+    
     def __init__(self, base_dir, is_prod):
+        self.category_colors = {}
         self.base_dir = base_dir
         self.data_dir = os.path.join(base_dir, "data")
         os.makedirs(self.data_dir, exist_ok=True)
@@ -108,6 +116,31 @@ class DataManager:
         self.save_data(self.file_path, self.active_profile)
         logging.info(f"Income updated to {income}")
 
+    def assign_category_colors(self):
+        """
+        Assign a random, unique color to each category in the budget.
+        """
+        budget_data = self.get_budget()
+        available_colors = self.COLOR_PALETTE[:]
+
+        for category in budget_data["Category"]:
+            if category not in self.category_colors:
+                if not available_colors:
+                    raise ValueError("Not enough colors to assign to all categories.")
+                color = random.choice(available_colors)
+                available_colors.remove(color)
+                self.category_colors[category] = color
+
+    def get_category_color(self, category):
+        """
+        Retrieve the color associated with a specific category.
+        """
+        return self.category_colors.get(category, "#FFFFFF")
+
+    ##############
+    ##  BUDGET  ##
+    ##############
+
     def get_budget(self):
         if not self.active_profile:
             raise ValueError("No active profile loaded.")
@@ -119,3 +152,25 @@ class DataManager:
         self.active_profile["data"] = new_budget
         self.save_data(self.file_path, self.active_profile)
         logging.info("Budget data updated.")
+    
+    def get_total_budget(self):
+        """
+        Calculate the total budget across all categories.
+        """
+        data = self.get_budget()
+        return sum(data["Cost per Month"])
+
+    def get_category_percentages(self):
+        """
+        Calculate the percentage breakdown of each category in the budget.
+        """
+        data = self.get_budget()
+        total_budget = self.get_total_budget()
+
+        if total_budget == 0:
+            return [0] * len(data["Cost per Month"])
+
+        return [
+            (cost / total_budget) * 100
+            for cost in data["Cost per Month"]
+        ]
