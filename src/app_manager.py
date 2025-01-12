@@ -219,6 +219,15 @@ class BudgetTrackerApp(App):
             return [int(hex_color[i:i+2], 16) / 255.0 for i in (0, 2, 4)] + [1.0]
         else:
             raise ValueError("Invalid hex color format. Use #RRGGBB or #RRGGBBAA.")
+    
+    @staticmethod
+    def update_rect(instance, _):
+        """Update the background rectangle size and position."""
+        for instruction in instance.canvas.before.children:
+            if isinstance(instruction, Rectangle):
+                instruction.size = instance.size
+                instruction.pos = instance.pos
+                break  # Update only the first matching Rectangle
 
 class MARGINS(Structure):
     _fields_ = [("cxLeftWidth", c_int),
