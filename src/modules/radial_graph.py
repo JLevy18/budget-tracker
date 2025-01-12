@@ -118,20 +118,6 @@ class RadialPercentageTracker(FigureCanvasKivyAgg):
             color="#FFFFFF", 
             fontweight='normal'  # Lighter weight for the text
         )
-        
-        # Add top-left label
-        self.ax.text(
-            -2.3, 1.6, f"{now.strftime("%B")} spending",  # Month label
-            ha='left', va='top', fontsize=11, color="#FFFFFF", fontweight="bold"
-        )
-        self.ax.text(
-            -2.3, 1.3, f"$1,459.32",  # Amount spent label
-            ha='left', va='top', fontsize=16, color="#FFFFFF", fontweight="light"
-        )
-        self.ax.text(
-            -2.3, 1, "Spent so far",  # Supporting text
-            ha='left', va='top', fontsize=9, color="#FFFFFF"
-        )
 
         # Hide axes
         self.ax.axis('off')

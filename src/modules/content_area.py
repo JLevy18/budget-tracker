@@ -9,10 +9,14 @@ class DashboardScreen(Screen):
 class TransactionScreen(Screen):
     pass
 
+class SettingsScreen(Screen):
+    pass
+
 class ContentArea(ScreenManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs) 
         self.transition = SlideTransition()
         self.add_widget(DashboardScreen(name="dashboard"))
         self.add_widget(TransactionScreen(name="transaction"))
+        self.add_widget(SettingsScreen(name="settings"))
         self.current = "dashboard"

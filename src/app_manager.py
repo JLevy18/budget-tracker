@@ -1,6 +1,7 @@
 
 import os
 import sys
+import random
 
 from kivy.app import App
 from kivy.factory import Factory
@@ -10,7 +11,7 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.layout import Layout
 from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, FadeTransition
-from kivy.graphics import Color, Line
+from kivy.graphics import Color, Line, Rectangle
 
 from src.modules.app_bar import AppBar
 from src.modules.nav_bar import NavBar
@@ -55,6 +56,7 @@ class BudgetTrackerApp(App):
         super().__init__(**kwargs)
         self.content_area = ContentArea()
         self.is_prod = is_prod
+        self.background_toggle = False
         self.window_state = {
             "size": Window.size,
             "pos": (Window.left, Window.top),
@@ -64,7 +66,31 @@ class BudgetTrackerApp(App):
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
         self.is_transitioning = False
-        
+    
+    
+    def toggle_background_colors(self):
+        """Toggle background colors for all widgets."""
+        self.background_toggle = not  self.background_toggle
+        self.apply_background_colors(self.root)
+
+    def apply_background_colors(self, widget):
+        """Recursively apply background colors to the widget tree."""
+        with widget.canvas.before:
+            if self.background_toggle:
+                # Generate a random neon color (bright, high-saturation RGB) with low opacity
+                r, g, b = random.choices([0, 1], k=3)  # Returns a list of three elements
+                Color(r, g, b, 0.3)  # 30% opacity
+            else:
+                Color(1, 1, 1, 0)
+
+            # Redraw the rectangle
+            Rectangle(size=widget.size, pos=widget.pos)
+
+            
+        # Recurse for child widgets
+        for child in widget.children:
+            self.apply_background_colors(child)
+                
     def change_font_path_callback(self, widget, state):
         if state == "enter":
             widget.font_name = self.font_path
@@ -87,24 +113,38 @@ class BudgetTrackerApp(App):
         Window.minimum_height = 480
         Window.left = 300
         Window.top = 150
+        
+        Window.bind(on_key_down=self.on_key_down)
 
         hwnd = windll.user32.GetForegroundWindow()
         self.enable_shadow(hwnd)
 
         return root
+    def on_key_down(self, window, key, scancode, codepoint, modifiers):
+        if key == 284:  # Keycode for F3
+            self.toggle_background_colors()
 
     def switch_screen(self, screen_name):
         """Switch to the specified screen."""
         sm = self.root.ids.content_area
-        # Determine slide direction based on the target screen
-        if sm.current == "dashboard" and screen_name == "transaction":
-            sm.transition.direction = "left"  # Slide left when going to transaction
-        elif sm.current == "transaction" and screen_name == "dashboard":
-            sm.transition.direction = "right"  # Slide right when going back to dashboard
+
+        # Define the order of the screens
+        screen_order = ["dashboard", "transaction", "settings"]
+
+        # Get the current and target indices
+        current_index = screen_order.index(sm.current)
+        target_index = screen_order.index(screen_name)
+
+        # Determine swipe direction based on indices
+        if current_index < target_index:
+            sm.transition.direction = "left"  # Swipe left to move forward
+        elif current_index > target_index:
+            sm.transition.direction = "right"  # Swipe right to move backward
 
         # Switch screens only if the target screen is different
         if sm.current != screen_name:
             sm.current = screen_name
+
 
     def minimize_window(self):
         """Minimize the application window."""

@@ -3,7 +3,7 @@
     padding: [10,10,10,10]
     BoxLayout:
         orientation: 'vertical'
-        size_hint: 0.4, 1
+        size_hint: 0.35, 1
         BoxLayout:
             padding: [10,10,0,0]
             orientation: 'horizontal'
@@ -21,7 +21,7 @@
                 id: monthly_spending_summary
     BoxLayout:
         orientation: 'vertical'
-        size_hint: 0.6, 1
+        size_hint: 0.65, 1
         BoxLayout:
             orientation: 'vertical'
             FloatLayout:
@@ -31,9 +31,13 @@
                     font_size: 22
                     bold: True
                     color: 1, 1, 1, 1
-                    pos_hint: {"center_x": 0.5, "center_y": 0.01}
+                    pos_hint: {"center_x": 0.62, "center_y": 0.01}
             BoxLayout:
                 orientation: 'horizontal'
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint: 0.6, 1
+                    
                 AnchorLayout:
                     anchor_x: "center"
                     anchor_y: "center"
@@ -45,7 +49,7 @@
                     size_hint: 1,1
                     id: actual_category_pie_chart
         BoxLayout:
-            padding: [20,20,0,0]
+            padding: [0,20,0,0]
             size_hint: 1,1
             id: budget_view
             

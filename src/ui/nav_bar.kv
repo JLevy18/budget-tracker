@@ -1,15 +1,16 @@
 <NavBar>:
     anchor_x: "center"
-    anchor_y: "center"
+    anchor_y: "top"
     AnchorLayout:
         size_hint: None,0.5
+        width: 150
         BoxLayout:
             orientation: "horizontal"
             AnchorLayout:
                 anchor_x: "center"
                 anchor_y: "center"
                 HoverableButton:
-                    text: "\uef3e"  # Minimize icon
+                    text: "\uef3e"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
@@ -21,7 +22,7 @@
                 anchor_x: "center"
                 anchor_y: "center"
                 Label:
-                    text: "\u2022"  # Minimize icon
+                    text: "\u2022"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
@@ -29,7 +30,7 @@
                 anchor_x: "center"
                 anchor_y: "center"
                 HoverableButton:
-                    text: "\uef63"  # Minimize icon
+                    text: "\uef63"
                     size_hint: None, None
                     font_size: "32sp"
                     size: 32, 32
@@ -37,3 +38,23 @@
                     change_cursor_on_hover: True
                     hover_callback: app.change_font_path_callback
                     on_press: app.switch_screen("transaction")
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                Label:
+                    text: "\u2022"
+                    size_hint: None, None
+                    font_size: "32sp"
+                    size: 32, 32
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_y: "center"
+                HoverableButton:
+                    text: "\ue8b8"
+                    size_hint: None, None
+                    font_size: "32sp"
+                    size: 32, 32
+                    font_name: app.font_path_extralight
+                    change_cursor_on_hover: True
+                    hover_callback: app.change_font_path_callback
+                    on_press: app.switch_screen("settings")

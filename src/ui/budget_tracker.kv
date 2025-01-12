@@ -1,27 +1,84 @@
 <BudgetTracker>:
     orientation: 'vertical'
-    FloatLayout:
+    # AppBar at the top
+    BoxLayout:
         size_hint: 1, None
         height: 30
+        pos_hint: {"top": 1}
         AppBar:
             height: 30
-            pos_hint: {"top": 1}
             id: app_bar
-    FloatLayout:
+
+    # NavBar directly below AppBar
+    BoxLayout:
         size_hint: 1, None
-        height: 30
+        height: 50
+        pos_hint: {"top": 0.95}  # Adjust position below AppBar
         NavBar:
-            pos_hint: {"top": 1}
+            id: nav_bar
     ContentArea:
         size_hint: 1,1
         id: content_area
+    
+    
+    ### ABSOLUTE LABELS ###
+    FloatLayout:
+
+        size_hint: None, None
+        size: 0, 0
+
+        # Monthly Spending
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: None, None
+            pos: dp(20), root.height - dp(40) - self.minimum_height
+            spacing: dp(5)
+            Label:
+                id: month_spending_label
+                text: "January Spending"
+                font_size: "16sp"
+                bold: True
+                halign: "left"
+                valign: "middle"
+                text_size: None, None
+                size_hint: None, None
+                width: self.texture_size[0]
+                height: self.texture_size[1]
+            Label:
+                id: amount_label
+                text: "$1496.32"
+                font_size: "20sp"
+                bold: True
+                halign: "left"
+                valign: "middle"
+                text_size: None, None
+                size_hint: None, None
+                width: self.texture_size[0]
+                height: self.texture_size[1]
+            Label:
+                id: spent_so_far_label
+                text: "Spent so far"
+                font_size: "14sp"
+                bold: False
+                halign: "left"
+                valign: "middle"
+                text_size: None, None
+                size_hint: None, None
+                width: self.texture_size[0]
+                height: self.texture_size[1]
 
 <ContentArea>:
     DashboardScreen:
     TransactionScreen:
+    SettingsScreen:
 
 <DashboardScreen>:
     DashboardView:
 
 <TransactionScreen>:
     TransactionView:
+
+<SettingsScreen>:
+    BoxLayout:
+        Label:
+            text: "Settings"
