@@ -1,0 +1,130 @@
+<SettingsView>:
+    canvas.before:
+        Color:
+            rgba: app.hex_to_rgba("#14202E")  # Background color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        # Add BoxShadow for inset effect
+        Color:
+            rgba: 0, 0, 0, 1  # Shadow color
+        BoxShadow:
+            pos: self.x, self.y
+            size: self.size
+            inset: True
+            spread_radius: [0, 5]
+            blur_radius: 10  # Shadow blur radius
+    orientation: "horizontal"
+    size_hint: 1, 1
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 0.05
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        orientation: "vertical"
+        size_hint_x: 0.25
+        padding: [15, 15]
+        BoxLayout:
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height 
+            spacing: 2
+            Label:
+                text: "Profiles"
+                size_hint_y: None
+                height: 30
+                halign: "left"
+                text_size: self.size
+                font_size: 18
+                bold: True
+            Label:
+                text: "Loaded profile: "
+                font_size: 12
+                size_hint_y: None
+                height: 20
+                halign: "left"
+                text_size: self.size
+            Widget:
+                size_hint_y: None
+                height: 1
+                canvas.before:
+                    Color:
+                        rgba: 0.5, 0.5, 0.5, 1
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+            BoxLayout:
+                orientation: "vertical"
+                spacing: 5
+                size_hint_y: None
+                HoverableButton:
+                    text: "New Profile"
+                    size_hint_y: None
+                    height: 40
+                    hover_color: app.hex_to_rgba("#2B4257")
+                HoverableButton:
+                    text: "Load Profile"
+                    size_hint_y: None
+                    height: 40
+                    hover_color: app.hex_to_rgba("#2B4257")
+            Label:
+                text: "Settings"
+                size_hint_y: None
+                height: 30
+                font_size: 18
+                bold: True
+                halign: "left"
+                text_size: self.size
+            Widget:
+                size_hint_y: None
+                height: 1
+                canvas.before:
+                    Color:
+                        rgba: 0.5, 0.5, 0.5, 1
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+            BoxLayout:
+                orientation: "vertical"
+                spacing: 5
+                size_hint_y: None
+                HoverableButton:
+                    text: "Export As"
+                    size_hint_y: None
+                    height: 40
+                    hover_color: app.hex_to_rgba("#2B4257")
+                HoverableButton:
+                    text: "Check for Updates"
+                    size_hint_y: None
+                    height: 40
+                    hover_color: app.hex_to_rgba("#2B4257")
+        Widget:  # Spacer to push the content to the top
+            size_hint_y: 1
+    BoxLayout:
+        size_hint_x: 0.75
+        padding: [10, 10]
+        canvas.before:
+            Color:
+                rgba: app.hex_to_rgba("#14202E")  # Background color
+            Rectangle:
+                size: self.size
+                pos: self.pos
+            # Add BoxShadow for inset effect
+            Color:
+                rgba: 0, 0, 0, 1  # Shadow color
+            BoxShadow:
+                pos: self.x, self.y
+                size: self.size
+                inset: True
+                blur_radius: 20  # Shadow blur radius
+        SettingsArea:
+            id: settings_area
+
+
+<SettingsArea>:
+    ProfileScreen:
+
+<ProfileScreen>:
+    ProfileView:

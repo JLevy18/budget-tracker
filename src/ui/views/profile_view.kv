@@ -1,0 +1,78 @@
+<ProfileView>:
+    size_hint: 1, 1
+    orientation: "vertical"
+    AnchorLayout:
+        anchor_y: "center"
+        size_hint: 1, 1
+        padding: [10, 10, 10, 10]
+        BoxLayout:
+            size_hint: 0.75, 1  # Allow height to adjust dynamically
+            orientation: "vertical"
+            height: self.minimum_height  # Adjust height based on children
+            padding: [0, 10, 0, 0]
+            spacing: 5  # Space between rows
+
+            # Row: Profile Name
+            BoxLayout:
+                size_hint_x: 1
+                size_hint_y: None
+                height: 40  # Set a fixed height for consistent alignment
+                padding: [5, 5]
+                spacing: 10
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: "Profile Name: "
+                EditableLabel:
+                    size_hint_x: None
+                    text: "test"
+
+
+
+
+            # Row: Data Scan Destinations
+            BoxLayout:
+                size_hint_x: 1
+                size_hint_y: None
+                height: 40
+                padding: [5, 5]
+                spacing: 10
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: "Data Scan Destinations: "
+                EditableLabel:
+                    text: "test2"
+                    size_hint_x: 1
+
+            # Row: Monthly Income
+            BoxLayout:
+                size_hint_x: 1
+                size_hint_y: None
+                height: 40
+                padding: [5, 5]
+                spacing: 10
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: "Monthly Income: "
+                TextInput:
+                    size_hint_x: 1
+                    height: 30
+
+            # Row: Categories
+            BoxLayout:
+                size_hint_x: 1
+                size_hint_y: None
+                height: 40
+                padding: [5, 5]
+                spacing: 10
+                Label:
+                    size_hint: None, None
+                    size: self.texture_size
+                    text: "Categories: "
+                TextInput:
+                    size_hint_x: 1
+                    height: 30
+            BoxLayout:
+                size_hint: 1, 1 

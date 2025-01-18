@@ -33,6 +33,8 @@ Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
 Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
+Builder.load_file(os.path.join(KV_DIR, "views", "settings_view.kv"))
+Builder.load_file(os.path.join(KV_DIR, "views", "profile_view.kv"))
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.set('graphics', 'resizable', True)

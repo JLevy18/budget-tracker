@@ -21,51 +21,51 @@
         id: content_area
     
     
-    ### ABSOLUTE LABELS ###
-    FloatLayout:
+    # ### ABSOLUTE LABELS ###
+    # FloatLayout:
 
-        size_hint: None, None
-        size: 0, 0
+    #     size_hint: None, None
+    #     size: 0, 0
 
-        # Monthly Spending
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: None, None
-            pos: dp(20), root.height - dp(40) - self.minimum_height
-            spacing: dp(5)
-            Label:
-                id: month_spending_label
-                text: "January Spending"
-                font_size: "16sp"
-                bold: True
-                halign: "left"
-                valign: "middle"
-                text_size: None, None
-                size_hint: None, None
-                width: self.texture_size[0]
-                height: self.texture_size[1]
-            Label:
-                id: amount_label
-                text: "$1496.32"
-                font_size: "20sp"
-                bold: True
-                halign: "left"
-                valign: "middle"
-                text_size: None, None
-                size_hint: None, None
-                width: self.texture_size[0]
-                height: self.texture_size[1]
-            Label:
-                id: spent_so_far_label
-                text: "Spent so far"
-                font_size: "14sp"
-                bold: False
-                halign: "left"
-                valign: "middle"
-                text_size: None, None
-                size_hint: None, None
-                width: self.texture_size[0]
-                height: self.texture_size[1]
+    #     # Monthly Spending
+    #     BoxLayout:
+    #         orientation: 'vertical'
+    #         size_hint: None, None
+    #         pos: dp(20), root.height - dp(40) - self.minimum_height
+    #         spacing: dp(5)
+    #         Label:
+    #             id: month_spending_label
+    #             text: "January Spending"
+    #             font_size: "16sp"
+    #             bold: True
+    #             halign: "left"
+    #             valign: "middle"
+    #             text_size: None, None
+    #             size_hint: None, None
+    #             width: self.texture_size[0]
+    #             height: self.texture_size[1]
+    #         Label:
+    #             id: amount_label
+    #             text: "$1496.32"
+    #             font_size: "20sp"
+    #             bold: True
+    #             halign: "left"
+    #             valign: "middle"
+    #             text_size: None, None
+    #             size_hint: None, None
+    #             width: self.texture_size[0]
+    #             height: self.texture_size[1]
+    #         Label:
+    #             id: spent_so_far_label
+    #             text: "Spent so far"
+    #             font_size: "14sp"
+    #             bold: False
+    #             halign: "left"
+    #             valign: "middle"
+    #             text_size: None, None
+    #             size_hint: None, None
+    #             width: self.texture_size[0]
+    #             height: self.texture_size[1]
 
 <ContentArea>:
     DashboardScreen:
@@ -79,6 +79,5 @@
     TransactionView:
 
 <SettingsScreen>:
-    BoxLayout:
-        Label:
-            text: "Settings"
+    SettingsView:
+
