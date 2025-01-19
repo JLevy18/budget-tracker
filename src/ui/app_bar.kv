@@ -20,6 +20,7 @@
             font_name: app.font_path
             hover_color: app.hex_to_rgba("#2B4257")
             on_release: app.minimize_window()
+            transition: "smooth"
 
         HoverableButton:
             text: "\uE835"
@@ -28,6 +29,7 @@
             font_name: app.font_path
             hover_color: app.hex_to_rgba("#2B4257")
             on_release: app.maximize_window()
+            transition: "smooth"
 
         HoverableButton:
             text: "\uE5CD"
@@ -36,3 +38,4 @@
             font_name: app.font_path
             hover_color: app.hex_to_rgba("#D30000")
             on_release: app.close_window()
+            transition: "smooth"

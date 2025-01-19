@@ -16,7 +16,7 @@ from kivy.graphics import Color, Line, Rectangle
 from src.modules.app_bar import AppBar
 from src.modules.nav_bar import NavBar
 from src.modules.content_area import ContentArea
-from src.modules.hover_behavior import HoverableButton
+from src.modules.hover_behavior import HoverableButton, HoverBehavior
 from src.data_manager import DataManager, set_data_manager
 
 from ctypes import windll, Structure, c_int, byref
@@ -28,13 +28,6 @@ else:
     base_path = os.path.dirname(os.path.abspath(__file__))  # Current script's directory
 
 KV_DIR = os.path.join(base_path, "ui")
-Builder.load_file(os.path.join(KV_DIR, "budget_tracker.kv"))
-Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
-Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
-Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
-Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
-Builder.load_file(os.path.join(KV_DIR, "views", "settings_view.kv"))
-Builder.load_file(os.path.join(KV_DIR, "views", "profile_view.kv"))
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.set('graphics', 'resizable', True)
@@ -82,6 +75,14 @@ class BudgetTrackerApp(App):
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
         self.is_transitioning = False
+        
+        Builder.load_file(os.path.join(KV_DIR, "budget_tracker.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "views", "settings_view.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "views", "profile_view.kv"))
     
     
     def toggle_background_colors(self):
@@ -130,6 +131,7 @@ class BudgetTrackerApp(App):
         self.enable_shadow(hwnd)
 
         return root
+    
     def on_key_down(self, window, key, scancode, codepoint, modifiers):
         if key == 284:  # Keycode for F3
             self.toggle_background_colors()

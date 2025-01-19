@@ -32,16 +32,6 @@ class NavBar(AnchorLayout):
         if dashboard_button:
             self.select_button(dashboard_button)
     
-    def change_font_path_callback(self, widget, state):
-        if widget == self.selected_button:
-            # Don't change the font of the selected button
-            return
-
-        if state == "enter":
-            widget.font_name = self.app.font_path
-        elif state == "leave":
-            widget.font_name = self.app.font_path_extralight
-    
     def select_button(self, button):
         # Update font for the previously selected button
         if self.selected_button:
