@@ -1,0 +1,19 @@
+<Category>:
+    orientation: "horizontal"
+    size_hint: None, None
+    padding: [3,3]
+    spacing: 5
+    height: self.minimum_height
+    width: self.minimum_width
+    Label:
+        id: color
+        text: "\uef4a"
+        size_hint: None, None
+        font_name: app.font_path_filled
+        size: self.texture_size  # Match label size to its content
+        shorten: True
+    Label:
+        text: root.name
+        size_hint: None, None
+        size: self.texture_size
+        shorten: True

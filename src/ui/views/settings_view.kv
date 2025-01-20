@@ -30,7 +30,7 @@
             orientation: "vertical"
             size_hint_y: None
             height: self.minimum_height 
-            spacing: 2
+            spacing: 5
             Label:
                 text: "Profiles"
                 size_hint_y: None
@@ -39,13 +39,24 @@
                 text_size: self.size
                 font_size: 18
                 bold: True
-            Label:
-                text: "Loaded profile: "
-                font_size: 12
-                size_hint_y: None
+            BoxLayout:
+                orientation: "horizontal"
                 height: 20
-                halign: "left"
-                text_size: self.size
+                size_hint: 1, None
+                spacing: 2
+                Label:
+                    text: "Loaded profile:"
+                    font_size: 12
+                    size_hint: 0.4, None
+                    halign: "left"
+                    text_size: self.size
+                Label:
+                    text: root.active_profile
+                    font_size: 10
+                    bold: True
+                    size_hint: 1, None
+                    halign: "left"
+                    text_size: self.size
             Widget:
                 size_hint_y: None
                 height: 1

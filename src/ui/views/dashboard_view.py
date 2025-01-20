@@ -4,8 +4,9 @@ from src.data_manager import get_data_manager
 from src.modules.pie_chart import PieChart
 from src.modules.bar_graph import BarGraph
 from src.modules.radial_graph import RadialPercentageTracker
-from src.modules.classes.budget import Budget
+from src.modules.budget import Budget
 from src.ui.views.budget_view import BudgetView
+from collections import defaultdict
 import matplotlib.pyplot as plt
 import random
 import os
@@ -17,8 +18,8 @@ budgets_path = os.path.join(budgets_dir, "budget.csv")
 class DashboardView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.data_manager = get_data_manager()
-        self.data_manager.bind(on_budget_change=self.on_budget_updated)
+        self.active_profile = get_data_manager().get_active_profile()
+        get_data_manager().bind(on_profile_update=self.on_budget_updated)
         Clock.schedule_once(self.initialize_widgets)
 
     def initialize_widgets(self, *args):
@@ -27,7 +28,6 @@ class DashboardView(BoxLayout):
         self.add_pie_chart("actual_category_pie_chart")
         self.add_radial_tracker("radial_budget_progress", budget_percentage=30)
         self.add_bar_graph("monthly_spending_summary")
-        self.add_budget_view("budget_view")
 
     def on_budget_updated(self, *args):
         """
@@ -38,14 +38,29 @@ class DashboardView(BoxLayout):
     def calculate_pie_chart_data(self):
         """
         Perform pie chart calculations in a background thread.
+        Aggregate expenses at the category level before plotting.
         """
-        # Perform data preparation asynchronously
-        self.data_manager.assign_category_colors()
-        budget_data = self.data_manager.get_budget()
-        labels = budget_data["Category"]
-        values = budget_data["Cost per Month"]
-        percentages = self.data_manager.get_category_percentages()
-        colors = [self.data_manager.get_category_color(category) for category in labels]
+        budget = self.active_profile.get_budget()
+
+        category_totals = defaultdict(float)
+
+        for category in budget.categories:
+            for expense in category.expenses:
+                expense_name = expense.name
+                if expense_name in budget.names:
+                    expense_index = budget.names.index(expense_name)
+                    category_totals[category.name] += budget.costs[expense_index]
+                    
+        if not category_totals:
+            return  # Avoid updating with empty data
+                    
+        labels = list(category_totals.keys())
+        values = list(category_totals.values())
+        
+        total_cost = sum(values) or 1
+        percentages = [round((cost / total_cost) * 100, 2) for cost in values]
+        
+        colors = [self.active_profile.get_category_color(category) for category in labels]
 
         # Schedule the rendering on the main thread
         Clock.schedule_once(lambda dt: self.render_pie_chart("budget_category_pie_chart", labels, values, percentages, colors))

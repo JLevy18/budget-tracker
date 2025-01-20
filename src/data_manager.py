@@ -1,10 +1,12 @@
 import os
 import pickle
-import uuid
 import logging
 import random
 from kivy.event import EventDispatcher
 from kivy.properties import ObjectProperty
+from src.modules.profile import Profile
+from src.modules.budget import Budget
+from src.modules.configuration import Configuration
 
 data_manager_instance = None
 
@@ -18,14 +20,17 @@ def get_data_manager():
     return data_manager_instance
 
 class DataManager(EventDispatcher):
-    __events__ = ["on_budget_change"]
+    _instance = None
+    __events__ = ["on_profile_update"]
     
     budget_data = ObjectProperty()
-
-    COLOR_PALETTE = [
-        "#116530", "#21B6A8", "#A3EBB1", "#18A558", "#145DA0", "#2E8BC0",
-        "#B1D4E0", "#189AB4", "#75E6DA", "#10564F"
-    ]
+    
+    def __new__(cls, base_dir, is_prod):
+        """Ensure only one instance of DataManager exists."""
+        if cls._instance is None:
+            cls._instance = super(DataManager, cls).__new__(cls)
+            cls._instance.__init__(base_dir, is_prod)
+        return cls._instance
 
     def __init__(self, base_dir, is_prod):
         self.category_colors = {}
@@ -33,24 +38,21 @@ class DataManager(EventDispatcher):
         self.data_dir = os.path.join(base_dir, "data")
         os.makedirs(self.data_dir, exist_ok=True)
         self.file_path = None
+        
+        self.config = Configuration(self.data_dir)
         self.active_profile = None
         
 
     def create_new_profile(self, profile_name=None, income=0.0):
-        profile_name = profile_name or "Default Profile"
-        profile_id = str(uuid.uuid4())
-        file_path = os.path.join(self.data_dir, f"{profile_id}.dat")
-        profile_data = {
-            "profile_name": profile_name,
-            "income": income,  # Default income
-            "data": {
-                "Category": ["Housing", "Utilities", "Insurance", "Food & Essentials"],
-                "Name": ["Rent", "Utilities", "Auto", "Groceries"],
-                "Cost per Month": [1000.00, 100.00, 100.00, 300.00],
-            }
-        }
-        self.save_data(file_path, profile_data)
-        logging.info(f"New profile '{profile_name}' created with ID: {profile_id}")
+        """Create a new profile with a default budget."""
+        profile = Profile(name=profile_name or "Default Profile", income=income)
+        file_path = os.path.join(self.data_dir, f"{profile.id}.dat")
+        self.save_data(file_path, profile.to_dict())
+        
+        if self.config.get_default_profile() is None:
+            self.config.set_default_profile(profile.id)
+        
+        logging.info(f"New profile '{profile.name}' created with ID: {profile.id}")
         return file_path
 
     def save_data(self, file_path, data):
@@ -63,25 +65,25 @@ class DataManager(EventDispatcher):
             raise
 
     def load_data(self, file_path):
+        """Load profile data from file and return a `Profile` instance."""
         try:
             with open(file_path, "rb") as file:
                 profile_data = pickle.load(file)
-                # Ensure required fields
-                if "income" not in profile_data:
-                    profile_data["income"] = 0.0
-                if "data" not in profile_data:
-                    profile_data["data"] = {
-                        "Category": [],
-                        "Name": [],
-                        "Cost per Month": [],
-                    }
-                self.file_path = file_path
-                self.active_profile = profile_data
+                profile = Profile.from_dict(profile_data)
                 logging.info(f"Data loaded from {file_path}")
-                return profile_data
+                return profile
         except Exception as e:
             logging.error(f"Failed to load data from {file_path}: {e}")
             raise
+
+    def load_profile(self, file_path):
+        """
+        Load the profile from a file and set it as active.
+        """
+        self.active_profile = self.load_data(file_path)
+
+        if self.config.get_default_profile() is None:
+            self.config.set_default_profile(self.active_profile.id)
 
     def get_profiles(self):
         """
@@ -89,101 +91,41 @@ class DataManager(EventDispatcher):
         """
         profiles = []
         for file in os.listdir(self.data_dir):
-            if file.endswith(".dat"):
-                file_path = os.path.join(self.data_dir, file)
-                try:
-                    profile_data = self.load_data(file_path)
-                    profiles.append({"name": profile_data["profile_name"], "path": file_path})
-                except Exception:
-                    logging.warning(f"Skipping corrupted or invalid file: {file}")
+            file_path = os.path.join(self.data_dir, file)
+
+            if file == Configuration.CONFIG_FILE or not file.endswith(".dat"):
+                continue
+
+            try:
+                profile = self.load_data(file_path)
+                profiles.append(profile)
+            except Exception:
+                logging.warning(f"Skipping corrupted or invalid file: {file}")
+
         return profiles
 
     def set_active_profile(self, file_path):
         """
         Set the active profile by loading the corresponding .dat file.
         """
-        self.active_profile = self.load_data(file_path)
+        self.load_profile(file_path)
 
     def get_active_profile(self):
-        if self.active_profile:
-            return self.active_profile["data"]
-        else:
+        """Return the active `Profile` instance instead of a dictionary."""
+        if not self.active_profile:
             logging.error("No active profile set.")
             raise ValueError("No active profile set.")
-    def get_income(self):
-        if not self.active_profile:
-            raise ValueError("No active profile loaded.")
-        return self.active_profile.get("income", 0.0)
-
-    def set_income(self, income):
-        if not self.active_profile:
-            raise ValueError("No active profile loaded.")
-        self.active_profile["income"] = income
-        self.save_data(self.file_path, self.active_profile)
-        logging.info(f"Income updated to {income}")
-
-    def assign_category_colors(self):
-        """
-        Assign a random, unique color to each category in the budget.
-        """
-        budget_data = self.get_budget()
-        available_colors = self.COLOR_PALETTE[:]
-
-        for category in budget_data["Category"]:
-            if category not in self.category_colors:
-                if not available_colors:
-                    raise ValueError("Not enough colors to assign to all categories.")
-                color = random.choice(available_colors)
-                available_colors.remove(color)
-                self.category_colors[category] = color
-
-    def get_category_color(self, category):
-        """
-        Retrieve the color associated with a specific category.
-        """
-        return self.category_colors.get(category, "#FFFFFF")
-
-    ##############
-    ##  BUDGET  ##
-    ##############
-
-    def get_budget(self):
-        if not self.active_profile:
-            raise ValueError("No active profile loaded.")
-        return self.active_profile["data"]
-
-    def set_budget(self, new_budget):
-        if not self.active_profile:
-            raise ValueError("No active profile loaded.")
-        self.active_profile["data"] = new_budget
-        self.save_data(self.file_path, self.active_profile)
-        
-        self.dispatch("on_budget_change")
+        return self.active_profile
     
-    def on_budget_change(self):
-        """
-        Event triggered when the budget changes.
-        """
-        pass
-    
-    def get_total_budget(self):
-        """
-        Calculate the total budget across all categories.
-        """
-        data = self.get_budget()
-        return sum(data["Cost per Month"])
+    def update_profile(self):
+        """Save the entire active profile to its data file."""
+        if not self.active_profile:
+            raise ValueError("No active profile loaded.")
 
-    def get_category_percentages(self):
-        """
-        Calculate the percentage breakdown of each category in the budget.
-        """
-        data = self.get_budget()
-        total_budget = self.get_total_budget()
+        file_path = os.path.join(self.data_dir, f"{self.active_profile.id}.dat")
+        self.save_data(file_path, self.active_profile.to_dict())  # ✅ Save full profile
 
-        if total_budget == 0:
-            return [0] * len(data["Cost per Month"])
+        self.dispatch("on_profile_update")
+        logging.info(f"Profile '{self.active_profile.name}' updated and saved.")
 
-        return [
-            (cost / total_budget) * 100
-            for cost in data["Cost per Month"]
-        ]
+    def on_profile_update(self, *args): pass

@@ -1,6 +1,56 @@
 <BudgetView>:
-    orientation: 'horizontal'
+    orientation: 'vertical'
     size_hint: 1,1
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: 40
+        spacing: 5
+        HoverableButton:
+            size_hint: None, None
+            text: "\ue835"
+            font_size: "32sp"
+            size: 32, 32
+            pos_hint: {"center_y": 0.5}
+            font_name: app.font_path_extralight
+            change_cursor_on_hover: True
+            hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+        HoverableButton:
+            size_hint: None, None
+            text: "\ue146"
+            font_size: "32sp"
+            size: 32, 32
+            pos_hint: {"center_y": 0.5}
+            font_name: app.font_path_extralight
+            change_cursor_on_hover: True
+            hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+        HoverableButton:
+            size_hint: None, None
+            text: "\ue872"
+            font_size: "32sp"
+            size: 32, 32
+            pos_hint: {"center_y": 0.5}
+            font_name: app.font_path_extralight
+            change_cursor_on_hover: True
+            hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+        HoverableButton:
+            size_hint: None, None
+            text: "\ue152"
+            font_size: "32sp"
+            size: 32, 32
+            pos_hint: {"center_y": 0.5}
+            font_name: app.font_path_extralight
+            change_cursor_on_hover: True
+            hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+        HoverableButton:
+            size_hint: None, None
+            text: "\ue40a"
+            font_size: "32sp"
+            size: 32, 32
+            pos_hint: {"center_y": 0.5}
+            font_name: app.font_path_extralight
+            change_cursor_on_hover: True
+            hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
     ScrollView:
         do_scroll_x: False
         size_hint: 1,1

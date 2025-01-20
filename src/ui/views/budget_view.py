@@ -11,13 +11,12 @@ class BudgetView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
-        self.data_manager = get_data_manager()
-        self.active_text_input = None
-        self.last_saved_value = None
+        self.active_profile = get_data_manager().get_active_profile()
         self.populate_budget()
     
     def populate_budget(self):
-        budget_data = self.data_manager.get_budget()
+        """Populate the budget view with data from the active profile."""
+        budget = self.active_profile.get_budget() 
 
         budget_info = self.ids.budget_info
         budget_info.clear_widgets()
@@ -31,16 +30,22 @@ class BudgetView(BoxLayout):
 
         # Add budget rows with alternating colors
         row_colors = ["#14202E", "#2B4257"]  # Alternating colors
-        for i, (category, name, cost) in enumerate(
-            zip(budget_data["Category"], budget_data["Name"], budget_data["Cost per Month"])
-        ):
-            # Alternate row color
-            row_color = row_colors[i % len(row_colors)]
+        i = 0
+        for category in budget.categories:
+            active_expenses = [expense for expense in category.expenses if expense.name in budget.names]
 
-            # Add cells for each row with background color
-            self.add_editable_cell(budget_info, category, i, "Category", row_color)
-            self.add_editable_cell(budget_info, name, i, "Name", row_color)
-            self.add_editable_cell(budget_info, f"${cost:.2f}", i, "Cost per Month", row_color)
+            for expense in active_expenses:
+                expense_name = expense.name  # 🔥 Extract name from named tuple
+
+                row_color = row_colors[i % len(row_colors)]
+                cost_index = budget.names.index(expense_name) if expense_name in budget.names else -1
+                cost_value = budget.costs[cost_index] if cost_index >= 0 else 0.0
+
+                self.add_editable_cell(budget_info, category.name, i, "Category", row_color)
+                self.add_editable_cell(budget_info, expense_name, i, "Name", row_color)
+                self.add_editable_cell(budget_info, f"${cost_value:.2f}", i, "Cost per Month", row_color)
+
+                i += 1
     
             
     def add_editable_cell(self, layout, text, row_index, column_name, background_color):
@@ -72,15 +77,19 @@ class BudgetView(BoxLayout):
 
 
     def update_budget_data(self, new_text, row_index, column_name):
-        budget_data = self.data_manager.get_budget()
+        """Update the budget data in the active profile and save it."""
+        budget = self.active_profile.get_budget()
+
         if column_name == "Category":
-            budget_data["Category"][row_index] = new_text
+            budget.categories[row_index] = new_text
         elif column_name == "Name":
-            budget_data["Name"][row_index] = new_text
+            budget.names[row_index] = new_text
         elif column_name == "Cost per Month":
             try:
-                budget_data["Cost per Month"][row_index] = round(float(new_text.replace("$", "")), 2)
+                clean_value = new_text.replace("$", "").replace(",", "")
+                budget.costs[row_index] = round(float(clean_value), 2)
             except ValueError:
                 pass  # Ignore invalid input
-
-        self.data_manager.set_budget(budget_data)
+        
+        self.active_profile.budget = budget
+        get_data_manager().update_profile()

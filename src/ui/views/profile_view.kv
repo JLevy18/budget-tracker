@@ -18,24 +18,25 @@
                 size_hint_y: None
                 height: 40  # Set a fixed height for consistent alignment
                 padding: [5, 5]
-                spacing: 5
                 Label:
                     size_hint: None, None
-                    pos_hint: {"center_y": 0.5}
+                    pos_hint: {"center_y": 0.6}
                     size: self.texture_size
                     bold: True
-                    font_size: 20
-                    text: "Profile Name: "
+                    font_size: 22
+                    text: "Profile Name:  "
                 EditableLabel:
                     id: edit_profile
-                    font_size: 16
-                    max_content: 200
+                    font_size: 14
+                    bold: True
                     size_hint_x: None
-                    text: "test"
+                    text: root.profile_name
+                    on_commit: root.update_profile_name(self.text)
                 HoverableButton:
                     size_hint: None, None
                     text: "\uf88d"
                     font_size: "32sp"
+                    pos_hint: {"center_y": 0.7}
                     size: 32, 32
                     font_name: app.font_path_extralight
                     change_cursor_on_hover: True
@@ -49,46 +50,78 @@
                 size_hint_y: None
                 height: 40
                 padding: [5, 5]
-                spacing: 10
-                Label:
-                    size_hint: None, None
-                    pos_hint: {"center_y": 0.5}
-                    size: self.texture_size
-                    text: "Data Scan Destinations: "
-                EditableLabel:
-                    text: "test2"
-                    size_hint_x: 1
-
-            # Row: Monthly Income
-            BoxLayout:
-                size_hint_x: 1
-                size_hint_y: None
-                height: 40
-                padding: [5, 5]
-                spacing: 10
-                Label:
-                    size_hint: None, None
-                    pos_hint: {"center_y": 0.5}
-                    size: self.texture_size
-                    text: "Monthly Income: "
-                TextInput:
-                    size_hint_x: 1
-                    height: 30
-
+                BoxLayout:
+                    size_hint_x: 0.5
+                    spacing: 10
+                    Label:
+                        size_hint: None, None
+                        pos_hint: {"center_y": 0.5}
+                        size: self.texture_size
+                        bold: True
+                        text: "Data Scan Destinations:"
+                    HoverableButton:
+                        size_hint: None, None
+                        text: "\uf756"
+                        font_size: "32sp"
+                        size: 32, 32
+                        font_name: app.font_path_extralight
+                        change_cursor_on_hover: True
+                        hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+                BoxLayout:
+                    size_hint_x: 0.5
+                    spacing: 5
+                    Label:
+                        size_hint: None, None
+                        pos_hint: {"center_y": 0.5}
+                        size: self.texture_size
+                        bold: True
+                        text: "Monthly Income: "
+                    EditableLabel:
+                        id: monthly_income
+                        font_size: 14
+                        size_hint_x: None
+                        width: 300
+                        text: root.monthly_income
+                        on_commit: root.update_income(self.text)
+                    HoverableButton:
+                        size_hint: None, None
+                        text: "\uf88d"
+                        font_size: "32sp"
+                        size: 32, 32
+                        font_name: app.font_path_extralight
+                        change_cursor_on_hover: True
+                        hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+                        on_press: if not monthly_income.text_input: monthly_income.convert_to_text_input()
             # Row: Categories
             BoxLayout:
-                size_hint_x: 1
-                size_hint_y: None
+                orientation: 'vertical'
                 height: 40
                 padding: [5, 5]
                 spacing: 10
-                Label:
-                    size_hint: None, None
-                    pos_hint: {"center_y": 0.5}
-                    size: self.texture_size
-                    text: "Categories: "
-                TextInput:
-                    size_hint_x: 1
-                    height: 30
+                size_hint_y: None
+                height: self.minimum_height
+                BoxLayout:
+                    orientation: "horizontal"
+                    height: self.minimum_height
+                    size_hint_y: None
+                    Label:
+                        size_hint: None, None
+                        pos_hint: {"center_y": 0.5}
+                        size: self.texture_size
+                        text: "Categories: "
+                        bold: True
+                    HoverableButton:
+                        size_hint: None, None
+                        text: "\ue146"
+                        font_size: "32sp"
+                        size: 32, 32
+                        pos_hint: {"center_y": 0.5}
+                        font_name: app.font_path_extralight
+                        change_cursor_on_hover: True
+                        hover_callback: lambda widget, state: self.change_font_path_callback(root, widget, state)
+                CategoryLegend:
+                        
+            
+            # Budget
             BoxLayout:
-                size_hint: 1, 1 
+                id: budget_view

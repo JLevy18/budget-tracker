@@ -16,6 +16,8 @@ class EditableLabel(BoxLayout):
     cursor_color = ListProperty([])
     background_color = ListProperty([0,0,0,0.25])
     max_content = NumericProperty(None)
+    max_length = NumericProperty(None)
+    bold = BooleanProperty(False)
     
     def __init__(self, **kwargs):
         super().__init__(orientation="horizontal", **kwargs)
@@ -27,8 +29,9 @@ class EditableLabel(BoxLayout):
         self.bind(on_touch_up=self.on_double_click)
         
         
-        self.label = Label(valign="middle")
+        self.label = Label()
         self.label.bind(size=self.update_alignment)
+        self.bind(bold=self.update_font_weight)
         self.bind(text=self.update_text)
         self.bind(font_size=self.update_font_size)
         self.bind(text_align=self.update_alignment)
@@ -67,6 +70,9 @@ class EditableLabel(BoxLayout):
             background_color=self.background_color,
         )
 
+        if self.max_length:
+            self.text_input.bind(text=self.validate_text_length)
+
         self.text_input.bind(focus=self.on_unfocus)
     
         # Add the text input in place of the label
@@ -78,6 +84,12 @@ class EditableLabel(BoxLayout):
         self.text_input.focus = True
         if self.auto_highlight:
             self.text_input.select_all()
+
+    def validate_text_length(self, instance, value):
+        """Prevent exceeding max_length and dispatch notification event."""
+        if self.max_length and len(value) > self.max_length:
+            instance.text = instance.text[:self.max_length]
+            self.dispatch("on_text_exceed_limit", value)
 
     def on_unfocus(self, instance, focus):
         """Called when TextInput loses focus."""
@@ -126,6 +138,9 @@ class EditableLabel(BoxLayout):
         """Ensure font size updates dynamically in committed label."""
         self.label.font_size = self.font_size
     
+    def update_font_weight(self, *args):
+        self.label.bold = self.bold
+    
     def format_text(self, text):
         """Format the text based on its content."""
         text = text.strip()
@@ -152,7 +167,7 @@ class EditableLabel(BoxLayout):
         """Create a new Label instance."""
         self.label = Label(
             text=self.truncate_text(self.text),
-            valign="middle",
+            bold=self.bold,
             halign=self.text_align,
             size_hint=(1, 1),
         )
@@ -163,7 +178,7 @@ class EditableLabel(BoxLayout):
         if not self.label:
             return text
         
-        estimated_chars = int(self.label.width / 8)  # Approximate 8px per character
+        estimated_chars = int((self.label.width + 10) / 8) # Approximate 8px per character
         if self.max_content and self.width >= self.max_content:
             if len(text) > estimated_chars:
                 return text[: estimated_chars - 3] + "..."
@@ -180,7 +195,7 @@ class EditableLabel(BoxLayout):
 
     def get_text_width(self):
         """Estimate text width dynamically."""
-        estimated_width = (len(self.text) * 8) + 20  # Approximate width in pixels
+        estimated_width = (len(self.text) * 8)  # Approximate width in pixels
         return min(estimated_width, self.max_content) if self.max_content else estimated_width
 
     def update_text(self, *args):

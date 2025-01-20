@@ -17,7 +17,8 @@ from src.modules.app_bar import AppBar
 from src.modules.nav_bar import NavBar
 from src.modules.content_area import ContentArea
 from src.modules.hover_behavior import HoverableButton, HoverBehavior
-from src.data_manager import DataManager, set_data_manager
+from src.modules.configuration import Configuration
+from src.data_manager import DataManager, set_data_manager, get_data_manager
 
 from ctypes import windll, Structure, c_int, byref
 
@@ -38,23 +39,39 @@ def initialize_app(base_dir, is_prod):
     """
     Initialize the application by setting up the data manager and returning the app instance.
     """
+    
     # Initialize the data manager
     data_manager = DataManager(base_dir, is_prod)
     set_data_manager(data_manager)
     
     # Load profiles or create default if none exist
     profiles = data_manager.get_profiles()
+    
+    config = get_data_manager().config
+    
     if not profiles:
         default_file = data_manager.create_new_profile(income=5000.00)
-        data_manager.load_data(default_file)
+        data_manager.load_profile(default_file)
     else:
-        # Set the first profile as the active one by default
-        data_manager.load_data(profiles[0]["path"])
+        default_profile_id = config.get_default_profile()
+        profile_to_load = None
+        
+        for profile in profiles:
+            if profile.id == default_profile_id:
+                profile_to_load = profile
+                break
+        
+        if not profile_to_load:
+            profile_to_load = profiles[0]
+            config.set_default_profile(profile_to_load.id)
 
+        data_manager.load_profile(os.path.join(data_manager.data_dir, f"{profile_to_load.id}.dat"))
+        
     # Pass the data manager to the app
     app = BudgetTrackerApp(is_prod=is_prod)
 
     return data_manager, app
+
 class BudgetTracker(BoxLayout):
     pass
 class BudgetTrackerApp(App):
@@ -73,11 +90,14 @@ class BudgetTrackerApp(App):
         }
         self.font_path = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded.ttf")
         self.font_path_extralight = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded-ExtraLight.ttf")
+        self.font_path_filled = os.path.join(os.path.dirname(__file__), "../resources/MaterialSymbolsRounded_Filled-Regular.ttf")
         self.logo = os.path.join(os.path.dirname(__file__), "../resources/BudgetTracker.png")
         self.is_transitioning = False
         
         Builder.load_file(os.path.join(KV_DIR, "budget_tracker.kv"))
         Builder.load_file(os.path.join(KV_DIR, "app_bar.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "category.kv"))
+        Builder.load_file(os.path.join(KV_DIR, "category_legend.kv"))
         Builder.load_file(os.path.join(KV_DIR, "views", "budget_view.kv"))
         Builder.load_file(os.path.join(KV_DIR, "views", "dashboard_view.kv"))
         Builder.load_file(os.path.join(KV_DIR, "views", "transaction_view.kv"))
